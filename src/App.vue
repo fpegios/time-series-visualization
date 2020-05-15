@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <Navbar />
+    <Navbar v-if="isNavbarVisible()"/>
     <router-view />
   </v-app>
 </template>
@@ -16,6 +16,11 @@ export default {
   data () {
     return {
       test: this.$store.getters.test
+    }
+  },
+  methods: {
+    isNavbarVisible () {
+      return this.$route.name !== 'FileUpload'
     }
   },
   computed: {

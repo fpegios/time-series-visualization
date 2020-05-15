@@ -5,18 +5,27 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    fileName: 'foo.csv'
+    file: {
+      name: 'foo.csv',
+      data: 'undefined'
+    }
   },
   
   getters: {
     fileName (state) {
-      return state.fileName
+      return state.file.name
+    },
+    fileData (state) {
+      return state.file.data
     }
   },
   
   mutations: {
     setFileName (state, value) {
-      state.fileName = value
+      state.file.name = value
+    },
+    setFileData (state, value) {
+      state.file.data = value
     },
   },
   
