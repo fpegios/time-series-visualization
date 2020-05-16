@@ -6,8 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     file: {
-      name: 'foo.csv',
-      data: 'undefined'
+      name: undefined,
+      data: undefined
     }
   },
   
