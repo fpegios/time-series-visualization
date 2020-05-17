@@ -8,7 +8,9 @@ export default new Vuex.Store({
     file: {
       name: undefined,
       data: undefined
-    }
+    },
+    filteredData: [],
+    spinnerStatus: false
   },
   
   getters: {
@@ -17,6 +19,12 @@ export default new Vuex.Store({
     },
     fileData (state) {
       return state.file.data
+    },
+    filteredData (state) {
+      return state.filteredData
+    },
+    spinnerStatus (state) {
+      return state.spinnerStatus
     }
   },
   
@@ -27,8 +35,17 @@ export default new Vuex.Store({
     setFileData (state, value) {
       state.file.data = value
     },
+    setFilteredData (state, value) {
+      state.filteredData = value
+    },
+    setSpinnerStatus (state, value) {
+      state.spinnerStatus = value
+    },
   },
   
   actions: {
+    showSpinner (context, value = true) {
+      context.commit('setSpinnerStatus', value)
+    },
   }
 })
