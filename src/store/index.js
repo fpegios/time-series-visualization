@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    d3: undefined,
     file: {
       name: undefined,
       data: undefined
@@ -14,6 +15,9 @@ export default new Vuex.Store({
   },
   
   getters: {
+    d3 (state) {
+      return state.d3
+    },
     fileName (state) {
       return state.file.name
     },
@@ -29,6 +33,9 @@ export default new Vuex.Store({
   },
   
   mutations: {
+    setD3 (state, value) {
+      state.d3 = value
+    },
     setFileName (state, value) {
       state.file.name = value
     },

@@ -8,7 +8,6 @@
 export default {
   name: 'Calendar',
   props: {
-    msg: String
   }
 }
 </script>

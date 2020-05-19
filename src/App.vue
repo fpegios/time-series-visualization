@@ -14,6 +14,7 @@
 <script>
 import Filters from './components/Filters.vue'
 import Navbar from './components/Navbar.vue'
+import * as d3 from 'd3'
 
 export default {
   name: 'App',
@@ -35,7 +36,7 @@ export default {
     }
   },
   created() {
-
+    this.$store.commit('setD3', d3)
   },
   mounted () {
 

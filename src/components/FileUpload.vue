@@ -25,7 +25,6 @@
 export default {
   name: 'FileUpload',
   props: {
-    msg: String
   },
   data () {
     return {
@@ -95,7 +94,7 @@ export default {
       
       const date = new Date()
       date.setFullYear(isoDate.substring(0, 4))
-      date.setMonth(isoDate.substring(4, 6))
+      date.setMonth(parseInt(isoDate.substring(4, 6)) - 1)
       date.setDate(isoDate.substring(6, 8))
       date.setHours(isoDate.substring(9, 11))
       date.setMinutes(isoDate.substring(11, 13))

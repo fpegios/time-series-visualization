@@ -1,6 +1,6 @@
 <template>
   <v-container id="filters" fluid class="px-12">
-		<v-card class="mx-auto" max-width="100%">
+		<v-card max-width="100%">
 			<v-card-title>Filter Options</v-card-title>
 			<v-card-text>
 
