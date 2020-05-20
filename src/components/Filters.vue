@@ -60,7 +60,11 @@
 			</v-card-text>
 
 			<v-card-actions class="px-4 py-4 justify-end">
-				<span v-if="!filteredData.length" class="mr-6 red--text">No data available with the given filters</span>
+				<div class="mr-6">
+					<span v-if="!filteredData.length" class="mr-6 red--text">No data available with the given filters.</span>
+					<span v-if="!days.length" class="red--text">A day option should be selected.</span>
+				</div>
+				<v-btn color="red" outlined @click="onResetFiltersHandler">Reset Filters</v-btn>
 				<v-btn color="red" dark @click="filterData">Find Data</v-btn>
 			</v-card-actions>
     </v-card>
@@ -206,16 +210,24 @@ export default {
 			} else if (this.weekEnds.includes(newValue)) {
 				this.days = this.days.filter(v => v !== 'All Days' && v!== 'Weekends')
 			}
+		},
+		onResetFiltersHandler () {
+			this.$store.commit('setFilteredData', this.fileData)
+			this.days = ['All Days']
+			this.setDefaultDateRange()
+		},
+		setDefaultDateRange () {
+			this.dateFromIso = new Date(this.fileData[0].date).toISOString().substr(0, 10)
+			this.dateFromIsoFormatted = this.formatDate(this.dateFromIso)
+			this.dateToIso = new Date(this.fileData[this.fileData.length - 1].date).toISOString().substr(0, 10)
+			this.dateToIsoFormatted = this.formatDate(this.dateToIso)
 		}
   },
   created() {
 
   },
   mounted () {
-		this.dateFromIso = new Date(this.fileData[0].date).toISOString().substr(0, 10)
-		this.dateFromIsoFormatted = this.formatDate(this.dateFromIso)
-		this.dateToIso = new Date(this.fileData[this.fileData.length - 1].date).toISOString().substr(0, 10)
-		this.dateToIsoFormatted = this.formatDate(this.dateToIso)
+		this.setDefaultDateRange()
 		this.filterData()
   }
 }
