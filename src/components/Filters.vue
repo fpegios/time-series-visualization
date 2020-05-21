@@ -1,9 +1,13 @@
 <template>
   <v-container id="filters" fluid class="px-12">
 		<v-card max-width="100%">
-			<v-card-title>Filter Options</v-card-title>
-			<v-card-text>
+			<v-card-title class="justify-space-between align-start">
+				Filter Options
+				<v-icon v-if="isFilterOptionsActive" large @click="isFilterOptionsActive = false">minimize</v-icon>
+				<v-icon v-else large @click="isFilterOptionsActive = true">maximize</v-icon>
+			</v-card-title>
 
+			<v-card-text :class="{ 'd-none': !isFilterOptionsActive }">
 				<v-row class="mx-0" no-gutters>
 					<v-col cols="6"	>
 						<v-row class="mx-0">
@@ -59,7 +63,7 @@
 				</v-row>
 			</v-card-text>
 
-			<v-card-actions class="px-4 py-4 justify-end">
+			<v-card-actions class="px-4 py-4 justify-end" :class="{ 'd-none': !isFilterOptionsActive }">
 				<div class="mr-6">
 					<span v-if="!filteredData.length" class="mr-6 red--text">No data available with the given filters.</span>
 					<span v-if="!days.length" class="red--text">A day option should be selected.</span>
@@ -94,7 +98,8 @@ export default {
 				'Fridays',
 				'Saturdays',
 				'Sundays'
-			]
+			],
+			isFilterOptionsActive: true
     }
   },
   computed: {
@@ -232,5 +237,9 @@ export default {
 
 <style lang="scss" scoped>
 @import "../scss/_colors";
+
+.v-icon:focus:after {
+	opacity: 0!important;
+}
 
 </style>

@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div :class="svgWrapperSelector">
 		<h3 class="text-center">{{ title }}</h3>
 		<div :id="svgWrapperSelector"></div>
 	</div>
@@ -106,8 +106,8 @@ export default {
 		},
 		onDataSetHandler (data) {
 			this.filter(false)
-			this.d3.select('svg').remove()
-			this.d3.select('.tooltip').remove()
+			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
+			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
 			
 			const monthGroupData = this.getMonthGroupData(data)
 			if (!monthGroupData || !monthGroupData.length) return
@@ -182,22 +182,22 @@ export default {
 				.on('click', function (d) {
 					const isAlreadyClicked = that.d3.select(this).classed('active')
 
-					that.d3.select(`.slice.active`).classed('active', false)
-					that.d3.select(`.label.active`).classed('active', false)
-					that.d3.select('.line.active').classed('active', false)
+					that.d3.select(`#${that.svgWrapperSelector} .slice.active`).classed('active', false)
+					that.d3.select(`#${that.svgWrapperSelector} .label.active`).classed('active', false)
+					that.d3.select(`#${that.svgWrapperSelector} .line.active`).classed('active', false)
 					
 					if (isAlreadyClicked) {
 						that.filter(false)
 						return
 					}
 					
-					that.d3.select(`.slice.active`).classed('active', false)
-					that.d3.select(`.label.active`).classed('active', false)
-					that.d3.select('.line.active').classed('active', false)
+					that.d3.select(`#${that.svgWrapperSelector} .slice.active`).classed('active', false)
+					that.d3.select(`#${that.svgWrapperSelector} .label.active`).classed('active', false)
+					that.d3.select(`#${that.svgWrapperSelector} .line.active`).classed('active', false)
 					
 					that.d3.select(this).classed('active', true)
-					that.d3.select(`.label.${d.data.monthName}`).classed('active', true)
-					that.d3.select(`.line.${d.data.monthName}`).classed('active', true)
+					that.d3.select(`#${that.svgWrapperSelector} .label.${d.data.monthName}`).classed('active', true)
+					that.d3.select(`#${that.svgWrapperSelector} .line.${d.data.monthName}`).classed('active', true)
 					that.filter(true)
 				})
 
@@ -306,62 +306,59 @@ export default {
 <style lang="scss">
 @import "./../scss/_colors";
 
-svg {
-	width: 100%;
-	height: 100%;
-}
-
-.labels {
-	pointer-events: none;
-}
-
-.slice {
-	stroke-width: 2px;
-	cursor: pointer;
-	&.hovered {
-		stroke: black;
+.month-donut {
+	.labels {
+		pointer-events: none;
 	}
-}
 
-polyline {
-	opacity: .3;
-	stroke: black;
-	stroke-width: 2px;
-	fill: none;
-	pointer-events: none;
-}
-
-.graph-title {
-	font-size: 1.2em;
-}
-
-.filtered {
-	.slice,
-	.label,
-	.line {
-		&:not(.active) {
-			opacity: 0.1;
+	.slice {
+		stroke-width: 2px;
+		cursor: pointer;
+		&.hovered {
+			stroke: black;
 		}
 	}
-}
 
-.tooltip {
-	position: absolute;
-	top: 0;
-	left: 0;
-	background-color: white;
-	border-radius: 4px;
-	border: 1px solid black;
-	padding: 5px;
-	pointer-events: none;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	color: black;
+	polyline {
+		opacity: .3;
+		stroke: black;
+		stroke-width: 2px;
+		fill: none;
+		pointer-events: none;
+	}
 
-	&.hidden {
-		display: none;
+	.graph-title {
+		font-size: 1.2em;
+	}
+
+	.filtered {
+		.slice,
+		.label,
+		.line {
+			&:not(.active) {
+				opacity: 0.1;
+			}
+		}
+	}
+
+	.tooltip {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background-color: white;
+		border-radius: 4px;
+		border: 1px solid black;
+		padding: 5px;
+		pointer-events: none;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		color: black;
+
+		&.hidden {
+			display: none;
+		}
 	}
 }
 

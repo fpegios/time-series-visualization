@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div :class="svgWrapperSelector">
 		<h3 class="text-center">{{ title }}</h3>
 		<div :id="svgWrapperSelector"></div>
 	</div>
@@ -20,12 +20,12 @@ export default {
 				y: 'Observations'
 			},
 			svgMargin: {
-        top: 40,
+        top: 20,
         right: 30,
         bottom: 60,
         left: 65
 			},
-			svgHeight: 275
+			svgHeight: 250
     }
   },
   computed: {
@@ -117,7 +117,7 @@ export default {
         .attr('dx', '0')
 				.attr('dy', '15')
 
-			this.d3.select('.axis-x')
+			svg.select('.axis-x')
 				.append('text')
         .attr('class', 'axis-label')
         .attr('x', width / 2)
@@ -178,8 +178,8 @@ export default {
       })
 		},
 		onDataSetHandler (data) {
-			this.d3.select('svg').remove()
-			this.d3.select('.tooltip').remove()
+			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
+			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
 			
 			const dayGroupData = this.getDayGroupData(data)
 			if (!dayGroupData || !dayGroupData.length) return
@@ -206,50 +206,52 @@ export default {
 <style lang="scss">
 @import "./../scss/_colors";
 
-.bar {
-  fill: $cyan!important;
-	shape-rendering: crispEdges;
-	&.hovered {
-		fill: darken($cyan, 10%)!important;
+.day-histogram {
+	.bar {
+		fill: $cyan!important;
+		shape-rendering: crispEdges;
+		&.hovered {
+			fill: darken($cyan, 10%)!important;
+		}
 	}
-}
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
+	.axis path,
+	.axis line {
+		fill: none;
+		stroke: #000;
+		shape-rendering: crispEdges;
+	}
 
-.graph-title {
-	font-size: 1.2em;
-}
+	.graph-title {
+		font-size: 1.2em;
+	}
 
-.axis-label {
-  font-size: 1.1em;
-}
+	.axis-label {
+		font-size: 1.1em;
+	}
 
-.tick {
-	font-size: .75em;
-}
+	.tick {
+		font-size: .75em;
+	}
 
-.tooltip {
-	position: absolute;
-	top: 0;
-	left: 0;
-	background-color: white;
-	border-radius: 4px;
-	border: 1px solid black;
-	padding: 5px;
-	pointer-events: none;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	color: black;
+	.tooltip {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background-color: white;
+		border-radius: 4px;
+		border: 1px solid black;
+		padding: 5px;
+		pointer-events: none;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		color: black;
 
-	&.hidden {
-		display: none;
+		&.hidden {
+			display: none;
+		}
 	}
 }
 
