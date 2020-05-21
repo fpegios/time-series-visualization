@@ -290,7 +290,10 @@ export default {
 				.classed('hidden', false)
 				.style('left', `${this.d3.event.offsetX}px`)
 				.style('top', `${this.d3.event.offsetY}px`)
-				.html(`<span>${d.data.averageObservationsPerDay.toFixed(1)} observations/day</span>`)
+				.html(
+					`<span>${d.data.monthName}</span>` +
+					`<span>${d.data.averageObservationsPerDay.toFixed(1)} observations/day</span>`
+				)
 		},
 		filter (status) {
 			this.isFiltered = status
