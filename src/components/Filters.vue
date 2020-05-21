@@ -1,5 +1,5 @@
 <template>
-  <v-container id="filters" fluid class="px-12">
+  <v-container id="filters">
 		<v-card max-width="100%">
 			<v-card-title class="justify-space-between align-start">
 				Filter Options
@@ -7,10 +7,10 @@
 				<v-icon v-else large @click="isFilterOptionsActive = true">maximize</v-icon>
 			</v-card-title>
 
-			<v-card-text :class="{ 'd-none': !isFilterOptionsActive }">
-				<v-row class="mx-0" no-gutters>
+			<v-card-text :class="{ 'd-none': !isFilterOptionsActive }" class="pb-0">
+				<v-row class="mx-0">
 					<v-col cols="6"	>
-						<v-row class="mx-0">
+						<v-row class="mx-0" no-gutters>
 							<v-col cols="6">
 								<v-menu ref="dateFromMenu" v-model="dateFromMenu" transition="scale-transition" offset-y width="290px">
 									<template v-slot:activator="{ on }">
@@ -47,7 +47,7 @@
 						</v-row>
 					</v-col>
 					<v-col cols="6">
-						<v-row class="mx-0">
+						<v-row class="mx-0" no-gutters>
 							<v-col cols="12">
 								<v-select
 									v-model="days"

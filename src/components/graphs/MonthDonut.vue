@@ -1,6 +1,6 @@
 <template>
 	<div :class="svgWrapperSelector">
-		<h3 class="text-center mb-2">{{ title }}</h3>
+		<h2 class="text-center mb-2">{{ title }}</h2>
 		<div :id="svgWrapperSelector"></div>
 	</div>
 </template>
@@ -14,7 +14,7 @@ export default {
   data () {
     return {
 			svgWrapperSelector: 'month-donut',
-			title: 'Day Average Observations per Month',
+			title: 'Day average observations per month',
 			svgMargin: {
         top: 40,
         right: 30,
@@ -143,7 +143,7 @@ export default {
 				.innerRadius(radius * 0.9)
 				.outerRadius(radius * 0.9)
 
-			svg.attr('transform', `translate(${width / 2}, ${height / 2 - 10})`)
+			svg.attr('transform', `translate(${width / 2}, ${height / 2 + 10})`)
 
 			const key = d => { return d.data.monthName }
 
@@ -336,7 +336,7 @@ export default {
 		.label,
 		.line {
 			&:not(.active) {
-				opacity: 0.1;
+				opacity: .15;
 			}
 		}
 	}

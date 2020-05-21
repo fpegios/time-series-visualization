@@ -48,6 +48,12 @@ export default {
 @import 'scss/main.scss';
 @import "scss/_colors";
 
+.container {
+  &:not(#navbar) {
+    max-width: 1200px!important;
+  }
+}
+
 .v-progress-circular {
   position: fixed!important;
   top: 0;

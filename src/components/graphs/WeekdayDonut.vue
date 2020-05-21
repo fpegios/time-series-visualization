@@ -1,6 +1,6 @@
 <template>
 	<div :class="svgWrapperSelector">
-		<h3 class="text-center mb-2">{{ title }}</h3>
+		<h2 class="text-center mb-2">{{ title }}</h2>
 		<div :id="svgWrapperSelector"></div>
 	</div>
 </template>
@@ -14,7 +14,7 @@ export default {
   data () {
     return {
 			svgWrapperSelector: 'weekday-donut',
-			title: 'Day Average Observations per Weekday',
+			title: 'Day average observations per weekday',
 			svgMargin: {
         top: 40,
         right: 30,
@@ -68,7 +68,7 @@ export default {
 			const weekdayGroupData = []
 			this.filteredData.forEach(fd => {
 				const weekdayGroup = weekdayGroupData.find(mgd => mgd.day === fd.date.getDay())
-				const dateString = `${fd.date.getDate()}-${fd.date.getMonth()}-${fd.date.getFullYear()}`
+				const dateString = `${fd.date.getDate()}-${fd.date.getMonth() + 1}-${fd.date.getFullYear()}`
 
 				if (weekdayGroup) {
 					if (!weekdayGroup.dates.includes(dateString)) {
@@ -134,7 +134,7 @@ export default {
 				.innerRadius(radius * 0.9)
 				.outerRadius(radius * 0.9)
 
-			svg.attr('transform', `translate(${width / 2}, ${height / 2 - 10})`)
+			svg.attr('transform', `translate(${width / 2}, ${height / 2 + 10})`)
 
 			const key = d => { return d.data.weekdayName }
 
@@ -327,7 +327,7 @@ export default {
 		.label,
 		.line {
 			&:not(.active) {
-				opacity: 0.1;
+				opacity: .15;
 			}
 		}
 	}

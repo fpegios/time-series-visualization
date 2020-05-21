@@ -1,6 +1,6 @@
 <template>
 	<div :class="svgWrapperSelector">
-		<h3 class="text-center">{{ title }}</h3>
+		<h2 class="text-center">{{ title }}</h2>
 		<div :id="svgWrapperSelector"></div>
 	</div>
 </template>
@@ -16,7 +16,7 @@ export default {
 			svgWrapperSelector: 'day-histogram',
 			title: 'Observations per day',
 			axisLabels: {
-				x: 'Day',
+				x: 'Days',
 				y: 'Observations'
 			},
 			svgMargin: {
@@ -25,7 +25,7 @@ export default {
         bottom: 60,
         left: 65
 			},
-			svgHeight: 250
+			svgHeight: 220
     }
   },
   computed: {
@@ -118,11 +118,12 @@ export default {
 			svg.select('.axis-x')
 				.append('text')
         .attr('class', 'axis-label')
-        .attr('x', width / 2)
+        .attr('x', width / 2 - 40)
         .attr('y', 55)
         .text(this.axisLabels.x);
       
-      const yAxis = this.d3.svg.axis().scale(yScale).orient('left')
+			const yAxis = this.d3.svg.axis().scale(yScale).orient('left')
+				.ticks(6)
         .tickSize(5)
 
       svg.append('g')
@@ -131,7 +132,7 @@ export default {
         .append('text')
         .attr('class', 'axis-label')
         .attr('transform', 'rotate(-90)')
-        .attr('x', -height + (height / 3))
+        .attr('x', -height + (height / 5))
         .attr('y', -40)
 				.text(this.axisLabels.y)
 				
@@ -222,16 +223,8 @@ export default {
 		shape-rendering: crispEdges;
 	}
 
-	.graph-title {
-		font-size: 1.2em;
-	}
-
 	.axis-label {
 		font-size: 1.1em;
-	}
-
-	.tick {
-		font-size: .75em;
 	}
 
 	.tooltip {
