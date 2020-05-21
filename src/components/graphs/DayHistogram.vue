@@ -49,9 +49,7 @@ export default {
 	},
   methods: {
     renderHistogram (data) {			
-      const svgWrapperWidth = this.svgWrapperRect.width
-
-      const width = svgWrapperWidth - this.svgMargin.left - this.svgMargin.right
+      const width = this.svgWrapperRect.width - this.svgMargin.left - this.svgMargin.right
 			const height = this.svgHeight - this.svgMargin.top - this.svgMargin.bottom
 
 			const tooltip = this.svgWrapper
@@ -204,7 +202,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "./../scss/_colors";
+@import "./../../scss/_colors";
 
 .day-histogram {
 	position: relative;

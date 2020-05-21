@@ -1,6 +1,6 @@
 <template>
 	<div :class="svgWrapperSelector">
-		<h3 class="text-center">{{ title }}</h3>
+		<h3 class="text-center mb-2">{{ title }}</h3>
 		<div :id="svgWrapperSelector"></div>
 	</div>
 </template>
@@ -15,17 +15,12 @@ export default {
     return {
 			svgWrapperSelector: 'month-donut',
 			title: 'Day Average Observations per Month',
-			axisLabels: {
-				x: 'Day',
-				y: 'Observations'
-			},
 			svgMargin: {
         top: 40,
         right: 30,
         bottom: 30,
         left: 65
 			},
-			svgHeight: 400,
 			isFiltered: false,
 			monthNames: [
 				'January',
@@ -102,7 +97,7 @@ export default {
 				}
 			})
 
-			return monthGroupData
+			return monthGroupData.sort((a, b) => a.month - b.month )
 		},
 		onDataSetHandler (data) {
 			this.filter(false)
@@ -117,7 +112,7 @@ export default {
 		renderDonut (data) {
 			const that = this
 			const width = this.svgWrapperRect.width
-			const height = this.svgHeight
+			const height = width / 2
 			const radius = Math.min(width, height) / 2
 
 			const tooltip = this.svgWrapper
@@ -127,7 +122,7 @@ export default {
 			const svg = this.svgWrapper
 				.append('svg')
         .attr('width', width)
-        .attr('height', height + this.svgMargin.bottom)
+        .attr('height', height)
 				.append('g')
 
 			svg.append('g').attr('class', 'slices')
@@ -307,7 +302,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "./../scss/_colors";
+@import "./../../scss/_colors";
 
 .month-donut {
 	position: relative;

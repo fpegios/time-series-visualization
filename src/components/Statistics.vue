@@ -13,6 +13,14 @@
             <MonthDonut :data="filteredData"/>
 					</v-col>
           <v-col cols="6">
+            WEEKS
+					</v-col>
+				</v-row>
+				<v-row class="mx-0" no-gutters>
+          <v-col cols="6">
+            <WeekdayDonut :data="filteredData"/>
+					</v-col>
+          <v-col cols="6">
 					</v-col>
 				</v-row>
       </v-card-text>
@@ -21,14 +29,16 @@
 </template>
 
 <script>
-import DayHistogram from './DayHistogram.vue'
-import MonthDonut from './MonthDonut.vue'
+import DayHistogram from './graphs/DayHistogram.vue'
+import MonthDonut from './graphs/MonthDonut.vue'
+import WeekdayDonut from './graphs/WeekdayDonut.vue'
 
 export default {
   name: 'Statistics',
   components: {
     DayHistogram,
-    MonthDonut
+    MonthDonut,
+    WeekdayDonut
   },
   props: {
   },
@@ -57,6 +67,8 @@ export default {
 <style lang="scss">
 @import "./../scss/_colors";
 
-
+h3 {
+  color: $black;
+}
 
 </style>
