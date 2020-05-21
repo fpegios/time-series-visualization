@@ -288,8 +288,8 @@ export default {
 		showTooltip (tooltip, d) {
 			tooltip
 				.classed('hidden', false)
-				.style('left', `${this.d3.event.offsetX}px`)
-				.style('top', `${this.d3.event.offsetY}px`)
+				.style('left', `${this.d3.event.offsetX - 40}px`)
+				.style('top', `${this.d3.event.offsetY - 40}px`)
 				.html(
 					`<span>${d.data.monthName}</span>` +
 					`<span>${d.data.averageObservationsPerDay.toFixed(1)} observations/day</span>`
@@ -310,6 +310,8 @@ export default {
 @import "./../scss/_colors";
 
 .month-donut {
+	position: relative;
+
 	.labels {
 		pointer-events: none;
 	}
