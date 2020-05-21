@@ -4,8 +4,15 @@
 			<v-card-title>Statistics</v-card-title>
       <v-card-text>
 				<v-row class="mx-0" no-gutters>
-					<v-col cols="12">
-            <DayHistogram :data="filteredData"/>
+					<v-col cols="12" class="mb-6">
+            <!-- <DayHistogram :data="filteredData"/> -->
+					</v-col>
+				</v-row>
+				<v-row class="mx-0" no-gutters>
+          <v-col cols="6">
+            <MonthDonut :data="filteredData"/>
+					</v-col>
+          <v-col cols="6">
 					</v-col>
 				</v-row>
       </v-card-text>
@@ -14,12 +21,14 @@
 </template>
 
 <script>
-import DayHistogram from './DayHistogram.vue'
+// import DayHistogram from './DayHistogram.vue'
+import MonthDonut from './MonthDonut.vue'
 
 export default {
   name: 'Statistics',
   components: {
-    DayHistogram,
+    // DayHistogram,
+    MonthDonut
   },
   props: {
   },

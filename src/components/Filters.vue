@@ -186,10 +186,7 @@ export default {
 			
 			this.$store.commit('setFilteredData',
 				this.fileData.filter(v => {
-					if ( this.dateFrom <= v.date && v.date <= this.dateTo && this.filteredDays.includes(v.date.getDay())) {
-						return true
-					}
-					return false
+					return this.dateFrom <= v.date && v.date <= this.dateTo && this.filteredDays.includes(v.date.getDay())
 				})
 			)
 

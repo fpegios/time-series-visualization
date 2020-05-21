@@ -1,7 +1,8 @@
 <template>
-<div>
-  <div :id="svgWrapperSelector"></div>
-</div>
+	<div>
+		<h3 class="text-center">{{ title }}</h3>
+		<div :id="svgWrapperSelector"></div>
+	</div>
 </template>
 
 <script>
@@ -24,7 +25,7 @@ export default {
         bottom: 60,
         left: 65
 			},
-			svgHeight: 400
+			svgHeight: 275
     }
   },
   computed: {
@@ -73,12 +74,6 @@ export default {
 			const maxObservations = this.d3.max(data, d => d.numOfObservations)
       xScale.domain(this.d3.extent(data, d => d.date))
 			yScale.domain([0, maxObservations])
-			
-			svg.append('text')
-				.attr('class', 'graph-title')
-				.attr('x', width / 2 - 70)
-				.attr('y', -20)
-				.text(this.title)
 
       // Create bar and append data.close and x position set based on barWidth equidistant
       const barWidth = width / data.length
@@ -187,7 +182,7 @@ export default {
 			this.d3.select('.tooltip').remove()
 			
 			const dayGroupData = this.getDayGroupData(data)
-			if (!dayGroupData) return
+			if (!dayGroupData || !dayGroupData.length) return
 			
 			this.renderHistogram(dayGroupData)
 		},

@@ -62,7 +62,7 @@ export default {
         () => {
           this.$store.commit('setFileName', this.selectedFile[0].name)
           this.$store.commit('setFileData', this.convertCSVToJSON(readerResult))
-          this.$router.push('Statistics')
+          this.$router.push('/statistics')
         },
         error => {
           console.log(error);
