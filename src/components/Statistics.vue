@@ -20,6 +20,7 @@
             <WeekdayDonut :data="filteredData"/>
 					</v-col>
           <v-col cols="6">
+            <HourAsterplot :data="filteredData"/>
 					</v-col>
 				</v-row>
       </v-card-text>
@@ -32,6 +33,7 @@ import DayHistogram from './graphs/DayHistogram.vue'
 import MonthDonut from './graphs/MonthDonut.vue'
 import WeekdayDonut from './graphs/WeekdayDonut.vue'
 import WeekBarplot from './graphs/WeekBarplot.vue'
+import HourAsterplot from './graphs/HourAsterplot.vue'
 
 export default {
   name: 'Statistics',
@@ -39,7 +41,8 @@ export default {
     DayHistogram,
     MonthDonut,
     WeekdayDonut,
-    WeekBarplot
+    WeekBarplot,
+    HourAsterplot
   },
   props: {
   },

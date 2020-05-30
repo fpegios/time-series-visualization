@@ -16,10 +16,10 @@ export default {
 			svgWrapperSelector: 'weekday-donut',
 			title: 'Day average observations per weekday',
 			svgMargin: {
-        top: 40,
-        right: 30,
-        bottom: 30,
-        left: 65
+        top: 50,
+        right: 10,
+        bottom: 40,
+        left: 10
 			},
 			isFiltered: false,
 			weekdayNames: [
@@ -102,7 +102,7 @@ export default {
 		},
 		renderDonut (data) {
 			const that = this
-			const width = this.svgWrapperRect.width
+			const width = this.svgWrapperRect.width - this.svgMargin.left - this.svgMargin.right
 			const height = width / 2
 			const radius = Math.min(width, height) / 2
 
@@ -112,8 +112,8 @@ export default {
 
 			const svg = this.svgWrapper
 				.append('svg')
-        .attr('width', width)
-        .attr('height', height)
+        .attr('width', width + this.svgMargin.left + this.svgMargin.right)
+        .attr('height', height + this.svgMargin.top + this.svgMargin.bottom)
 				.append('g')
 
 			svg.append('g').attr('class', 'slices')
@@ -134,7 +134,7 @@ export default {
 				.innerRadius(radius * 0.9)
 				.outerRadius(radius * 0.9)
 
-			svg.attr('transform', `translate(${width / 2}, ${height / 2 + 10})`)
+			svg.attr('transform',  `translate(${width / 2 + this.svgMargin.left}, ${height / 2 + this.svgMargin.top})`)
 
 			const key = d => { return d.data.weekdayName }
 
@@ -316,10 +316,6 @@ export default {
 		stroke-width: 2px;
 		fill: none;
 		pointer-events: none;
-	}
-
-	.graph-title {
-		font-size: 1.2em;
 	}
 
 	.filtered {

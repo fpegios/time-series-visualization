@@ -48,6 +48,10 @@ export default {
 @import 'scss/main.scss';
 @import "scss/_colors";
 
+.position-absolute {
+  position: absolute;
+}
+
 .container {
   &:not(#navbar) {
     max-width: 1200px!important;
