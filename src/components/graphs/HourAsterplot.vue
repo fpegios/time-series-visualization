@@ -71,6 +71,16 @@ export default {
 		getTwoDigitForm (number) {
 			return ('0' + number).slice(-2)
 		},
+		getHouRange (hourFrom) {
+			let hourTo = hourFrom + 1
+			if (this.timePeriod === 'am' && hourFrom === 11) {
+				hourTo = 12
+			}
+			if (this.timePeriod === 'pm' && hourFrom === 23) {
+				hourTo = 0
+			}
+			return `${this.getTwoDigitForm(hourFrom)}-${this.getTwoDigitForm(hourTo)}`
+		},
     getHourGroupData (data) {
 			if (!data || !data.length) return false
 
@@ -240,7 +250,7 @@ export default {
 					return `#hour-arc${i}`
 				})
         .text((d, i) => {
-					return this.timePeriod === 'am' ? i : i + 12
+					return i
 				})
 		},
 		showTooltip (tooltip, d) {
@@ -249,7 +259,7 @@ export default {
 				.style('left', `${this.d3.event.offsetX - 50}px`)
 				.style('top', `${this.d3.event.offsetY - 40}px`)
 				.html(
-					`<span>${this.getTwoDigitForm(d.data.hour)}-${this.getTwoDigitForm(d.data.hour + 1)}</span>` +
+					`<span>${this.getHouRange(d.data.hour)}</span>` +
 					`<span>${d.data.averageObservationsPerHour.toFixed(1)} observations/day</span>`
 				)
 		},
