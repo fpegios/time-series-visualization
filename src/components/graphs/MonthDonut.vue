@@ -57,7 +57,22 @@ export default {
       return this.$store.getters.d3
     },
     filteredData () {
-      return this.$store.getters.filteredData
+      return this.data.filter(v => {
+				if (this.filter.month && this.filter.month !== v.date.getMonth()) return false
+				if (this.filter.week && this.filter.week !== v.week) return false
+				if (this.filter.weekday && this.filter.weekday !== v.date.getDay()) return false
+				if (this.filter.hour && this.filter.hour !== v.date.getHours()) return false
+				
+				return true
+			})
+		},
+    filter () {
+      return {
+				month: this.$store.getters.filterMonth,
+				week: this.$store.getters.filterWeek,
+				weekday: this.$store.getters.filterWeekday,
+				hour: this.$store.getters.filterHour
+			}
 		},
 		svgWrapper () {
 			return this.d3.select(`#${this.svgWrapperSelector}`)
@@ -67,16 +82,28 @@ export default {
 		}
 	},
 	watch: {
-		data (value) {
-			this.onDataSetHandler(value)
+		data () {
+			this.onDataSetHandler(this.filteredData)
+		},
+		filter (newValue, oldValue) {
+			if (oldValue && !this.isFiltered) this.onDataSetHandler(this.filteredData)
 		}
 	},
   methods: {
-    getMonthGroupData (data) {
+		onDataSetHandler (data) {
+			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
+			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
+			
+			const monthGroupData = this.getMonthGroupData(data)
+			if (!monthGroupData || !monthGroupData.length) return
+
+			this.renderDonut(monthGroupData)
+		},
+		getMonthGroupData (data) {
 			if (!data || !data.length) return false
 
 			const monthGroupData = []
-			this.filteredData.forEach(fd => {
+			data.forEach(fd => {
 				const monthGroup = monthGroupData.find(mgd => mgd.month === fd.date.getMonth())
 
 				if (monthGroup) {
@@ -99,19 +126,9 @@ export default {
 
 			return monthGroupData.sort((a, b) => a.month - b.month )
 		},
-		onDataSetHandler (data) {
-			this.filter(false)
-			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
-			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
-			
-			const monthGroupData = this.getMonthGroupData(data)
-			if (!monthGroupData || !monthGroupData.length) return
-
-			this.renderDonut(monthGroupData)
-		},
 		renderDonut (data) {
 			const that = this
-			const width = this.svgWrapperRect.width - this.svgMargin.left - this.svgMargin.right
+			const width = this.svgWrapperRect.width
 			const height = width / 2
 			const radius = Math.min(width, height) / 2
 
@@ -182,7 +199,7 @@ export default {
 					that.d3.select(`#${that.svgWrapperSelector} .line.active`).classed('active', false)
 					
 					if (isAlreadyClicked) {
-						that.filter(false)
+						that.setFilter(false)
 						return
 					}
 					
@@ -193,7 +210,7 @@ export default {
 					that.d3.select(this).classed('active', true)
 					that.d3.select(`#${that.svgWrapperSelector} .label.${d.data.monthName}`).classed('active', true)
 					that.d3.select(`#${that.svgWrapperSelector} .line.${d.data.monthName}`).classed('active', true)
-					that.filter(true)
+					that.setFilter(true, d.data)
 				})
 
 			slice		
@@ -277,7 +294,7 @@ export default {
 			
 			polyline.exit().remove()
 		},
-		midAngle(d){
+		midAngle(d) {
 			return d.startAngle + (d.endAngle - d.startAngle) / 2
 		},
 		showTooltip (tooltip, d) {
@@ -290,13 +307,15 @@ export default {
 					`<span>${d.data.averageObservationsPerDay.toFixed(1)} observations/day</span>`
 				)
 		},
-		filter (status) {
+		setFilter (status, data = undefined) {
 			this.isFiltered = status
 			this.svgWrapper.classed('filtered', status)
+			this.$store.commit('setFilterMonth', data && data.month)
 		}
   },
   mounted () {
-		this.onDataSetHandler(this.data)
+		this.setFilter(false)
+		this.onDataSetHandler(this.filteredData)
   }
 }
 </script>

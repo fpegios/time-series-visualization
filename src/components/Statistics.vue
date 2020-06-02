@@ -25,6 +25,7 @@
 				</v-row>
       </v-card-text>
     </v-card>
+    {{ filter }}
   </v-container>
 </template>
 
@@ -57,13 +58,15 @@ export default {
     },
     filteredData () {
       return this.$store.getters.filteredData
+    },
+    filter () {
+      return this.$store.getters.filter
     }
   },
   methods: {
     
   },
   mounted () {
-      
   }
 }
 </script>

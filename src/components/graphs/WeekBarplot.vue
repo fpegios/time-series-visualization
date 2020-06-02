@@ -33,7 +33,22 @@ export default {
       return this.$store.getters.d3
     },
     filteredData () {
-      return this.$store.getters.filteredData
+      return this.data.filter(v => {
+				if (this.filter.month && this.filter.month !== v.date.getMonth()) return false
+				if (this.filter.week && this.filter.week !== v.week) return false
+				if (this.filter.weekday && this.filter.weekday !== v.date.getDay()) return false
+				if (this.filter.hour && this.filter.hour !== v.date.getHours()) return false
+				
+				return true
+			})
+		},
+    filter () {
+      return {
+				month: this.$store.getters.filterMonth,
+				week: this.$store.getters.filterWeek,
+				weekday: this.$store.getters.filterWeekday,
+				hour: this.$store.getters.filterHour
+			}
 		},
 		svgWrapper () {
 			return this.d3.select(`#${this.svgWrapperSelector}`)
@@ -43,22 +58,14 @@ export default {
 		}
 	},
 	watch: {
-		data (value) {
-			this.onDataSetHandler(value)
+		data () {
+			this.onDataSetHandler(this.filteredData)
+		},
+		filter (newValue, oldValue) {
+			if (oldValue && !this.isFiltered) this.onDataSetHandler(this.filteredData)
 		}
 	},
   methods: {
-    getWeek (d) {
-      // Source: https://weeknumber.net/how-to/javascript
-      const date = new Date(d)
-      date.setHours(0, 0, 0, 0)
-      // Thursday in current week decides the year.
-      date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7)
-      // January 4 is always in week 1.
-      const week1 = new Date(date.getFullYear(), 0, 4);
-      // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-      return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)
-    },
     renderBarplot (data) {
 			const that = this
 			const width = this.svgWrapperRect.width - this.svgMargin.left - this.svgMargin.right
@@ -120,20 +127,20 @@ export default {
 					that.d3.select(this).classed('hovered', false)
 					tooltip.classed('hidden', true)
 				})
-				.on('click', function () {
+				.on('click', function (d) {
 					const isAlreadyClicked = that.d3.select(this).classed('active')
 
 					that.d3.select(`#${that.svgWrapperSelector} .bar.active`).classed('active', false)
 					
 					if (isAlreadyClicked) {
-						that.filter(false)
+						that.setFilter(false)
 						return
 					}
 					
 					that.d3.select(`#${that.svgWrapperSelector} .bar.active`).classed('active', false)
 					
 					that.d3.select(this).classed('active', true)
-					that.filter(true)
+					that.setFilter(true, d)
 				})
 			
 			svg.append('g')
@@ -177,12 +184,21 @@ export default {
 				.attr('stroke', '#f44336')
 				.attr('stroke-width', 2)
     },
+		onDataSetHandler (data) {
+			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
+			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
+			
+			const weekGroupData = this.getWeekGroupData(data)
+      if (!weekGroupData || !weekGroupData.length) return
+      
+			this.renderBarplot(weekGroupData)
+		},
     getWeekGroupData (data) {
 			if (!data || !data.length) return false
 
       const weekGroupData = []
-			this.filteredData.forEach(fd => {
-        const week = this.getWeek(fd.date)
+			data.forEach(fd => {
+        const week = fd.week
         const weekYear = `${week}/${fd.date.getFullYear()}`
 				const weekGroup = weekGroupData.find(mgd => mgd.weekYear === weekYear)
 				const dateString = `${fd.date.getDate()}-${fd.date.getMonth() + 1}-${fd.date.getFullYear()}`
@@ -207,33 +223,25 @@ export default {
       
       return weekGroupData
     },
-		onDataSetHandler (data) {
-			this.filter(false)
-			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
-			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
-			
-			const weekGroupData = this.getWeekGroupData(data)
-      if (!weekGroupData || !weekGroupData.length) return
-      
-			this.renderBarplot(weekGroupData)
-		},
 		showTooltip (tooltip, d) {
 			tooltip
 				.classed('hidden', false)
 				.style('left', `${this.d3.event.offsetX - 40}px`)
-				.style('top', `${this.d3.event.offsetY - 40}px`)
+				.style('top', `${this.d3.event.offsetY - 60}px`)
 				.html(
 					`<span>${d.weekYear}</span>` +
 					`<span>${d.averageObservationsPerDay.toFixed(1)} observations/day</span>`
 				)
 		},
-		filter (status) {
+		setFilter (status, data = undefined) {
 			this.isFiltered = status
 			this.svgWrapper.classed('filtered', status)
+			this.$store.commit('setFilterWeek', data && data.week)
 		}
   },
   mounted () {
-		this.onDataSetHandler(this.data)
+		this.setFilter(false)
+		this.onDataSetHandler(this.filteredData)
   }
 }
 </script>

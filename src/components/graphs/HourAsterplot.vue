@@ -6,6 +6,9 @@
 				<v-switch class="mx-0 my-0" :messages="timePeriod.toUpperCase()" @change='toggleTimePeriod'></v-switch>
 			</div>
 		</div>
+		<div class="d-flex justify-center align-center">
+			<v-btn color="primary" :disabled="!isFiltered">OPEN HOUR OBSERVATIONS</v-btn>
+		</div>
 	</div>
 </template>
 
@@ -48,7 +51,22 @@ export default {
       return this.$store.getters.d3
     },
     filteredData () {
-      return this.$store.getters.filteredData
+      return this.data.filter(v => {
+				if (this.filter.month && this.filter.month !== v.date.getMonth()) return false
+				if (this.filter.week && this.filter.week !== v.week) return false
+				if (this.filter.weekday && this.filter.weekday !== v.date.getDay()) return false
+				if (this.filter.hour && this.filter.hour !== v.date.getHours()) return false
+				
+				return true
+			})
+		},
+    filter () {
+      return {
+				month: this.$store.getters.filterMonth,
+				week: this.$store.getters.filterWeek,
+				weekday: this.$store.getters.filterWeekday,
+				hour: this.$store.getters.filterHour
+			}
 		},
 		svgWrapper () {
 			return this.d3.select(`#${this.svgWrapperSelector}`)
@@ -58,8 +76,11 @@ export default {
 		}
 	},
 	watch: {
-		data (value) {
-			this.onDataSetHandler(value)
+		data () {
+			this.onDataSetHandler(this.filteredData)
+		},
+		filter (newValue, oldValue) {
+			if (oldValue && !this.isFiltered) this.onDataSetHandler(this.filteredData)
 		}
 	},
   methods: {
@@ -81,6 +102,17 @@ export default {
 			}
 			return `${this.getTwoDigitForm(hourFrom)}-${this.getTwoDigitForm(hourTo)}`
 		},
+		onDataSetHandler (data) {
+			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
+			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
+			
+			const { hourGroupData, maxAverageObservationsPerHour } = this.getHourGroupData(data)
+      if (!hourGroupData || !hourGroupData.length) return
+
+			this.hourGroupData = hourGroupData
+			this.maxAverageObservationsPerHour = maxAverageObservationsPerHour
+			this.renderAsterplot()
+		},
     getHourGroupData (data) {
 			if (!data || !data.length) return false
 
@@ -96,13 +128,13 @@ export default {
 					dates: [],
 					numOfObservations: 0,
 					get averageObservationsPerHour () {
-						return this.numOfObservations || this.dates.length
+						return this.numOfObservations && this.dates.length
 							? this.numOfObservations / this.dates.length
 							: 0
 					}
 				})
 			}
-			this.filteredData.forEach(fd => {
+			data.forEach(fd => {
 				const hour = fd.date.getHours()
 				const hourGroup = hourGroupData.find(mgd => mgd.hour === hour)
 				const dateString = `${fd.date.getDate()}-${fd.date.getMonth() + 1}-${fd.date.getFullYear()}`
@@ -128,18 +160,6 @@ export default {
         hourGroupData: hourGroupData.sort((a, b) => a.hour - b.hour ),
         maxAverageObservationsPerHour
       }
-		},
-		onDataSetHandler (data) {
-			this.filter(false)
-			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
-			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
-			
-			const { hourGroupData, maxAverageObservationsPerHour } = this.getHourGroupData(data)
-      if (!hourGroupData || !hourGroupData.length) return
-
-			this.hourGroupData = hourGroupData
-			this.maxAverageObservationsPerHour = maxAverageObservationsPerHour
-			this.renderAsterplot()
 		},
 		renderAsterplot () {
 			const that = this
@@ -220,7 +240,7 @@ export default {
 					that.d3.select(`#${that.svgWrapperSelector} .hour-arc.active`).classed('active', false)
 					
 					if (isAlreadyClicked) {
-						that.filter(false)
+						that.setFilter(false)
 						return
 					}
 					
@@ -231,7 +251,7 @@ export default {
 					that.d3.select(this).classed('active', true)
 					that.d3.select(`#${that.svgWrapperSelector} .label.hour-${d.data.hour}`).classed('active', true)
 					that.d3.select(`#${that.svgWrapperSelector} .hour-arc.hour-${d.data.hour}`).classed('active', true)
-					that.filter(true)
+					that.setFilter(true, d.data)
 				})
 			
 			svg.selectAll('.label')
@@ -250,7 +270,7 @@ export default {
 					return `#hour-arc${i}`
 				})
         .text((d, i) => {
-					return i
+					return i === 0 ? 12 : i
 				})
 		},
 		showTooltip (tooltip, d) {
@@ -263,13 +283,15 @@ export default {
 					`<span>${d.data.averageObservationsPerHour.toFixed(1)} observations/day</span>`
 				)
 		},
-		filter (status) {
+		setFilter (status, data = undefined) {
 			this.isFiltered = status
 			this.svgWrapper.classed('filtered', status)
+			this.$store.commit('setFilterHour', data && data.hour)
 		}
   },
   mounted () {
-		this.onDataSetHandler(this.data)
+		this.setFilter(false)
+		this.onDataSetHandler(this.filteredData)
   }
 }
 </script>

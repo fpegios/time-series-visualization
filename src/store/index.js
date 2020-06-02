@@ -11,6 +11,10 @@ export default new Vuex.Store({
       data: undefined
     },
     filteredData: [],
+    filterMonth: undefined,
+    filterWeek: undefined,
+    filterWeekday: undefined,
+    filterHour: undefined,
     spinnerStatus: false
   },
   
@@ -29,6 +33,18 @@ export default new Vuex.Store({
     },
     spinnerStatus (state) {
       return state.spinnerStatus
+    },
+    filterMonth (state) {
+      return state.filterMonth
+    },
+    filterWeek (state) {
+      return state.filterWeek
+    },
+    filterWeekday (state) {
+      return state.filterWeekday
+    },
+    filterHour (state) {
+      return state.filterHour
     }
   },
   
@@ -48,6 +64,18 @@ export default new Vuex.Store({
     setSpinnerStatus (state, value) {
       state.spinnerStatus = value
     },
+    setFilterMonth (state, value) {
+      state.filterMonth = value
+    },
+    setFilterWeek (state, value) {
+      state.filterWeek = value
+    },
+    setFilterWeekday (state, value) {
+      state.filterWeekday = value
+    },
+    setFilterHour (state, value) {
+      state.filterHour = value
+    }
   },
   
   actions: {
