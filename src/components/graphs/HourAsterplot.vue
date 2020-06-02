@@ -116,10 +116,7 @@ export default {
     getHourGroupData (data) {
 			if (!data || !data.length) return false
 
-      let maxAverageObservationsPerHour = {
-				am: 0,
-				pm: 0
-			}
+      let maxAverageObservationsPerHour = 0
 			const hourGroupData = []
 
 			for (let i = 0; i < 24; i++) {
@@ -145,16 +142,11 @@ export default {
 				hourGroup.numOfObservations++
       })
       
-      hourGroupData.slice(0, 12).forEach(fd => {
-        maxAverageObservationsPerHour.am = fd.averageObservationsPerHour > maxAverageObservationsPerHour.am
+      hourGroupData.forEach(fd => {
+        maxAverageObservationsPerHour = fd.averageObservationsPerHour > maxAverageObservationsPerHour
           ? fd.averageObservationsPerHour
-          : maxAverageObservationsPerHour.am
+          : maxAverageObservationsPerHour
 			})
-			hourGroupData.slice(2).forEach(fd => {
-        maxAverageObservationsPerHour.pm = fd.averageObservationsPerHour > maxAverageObservationsPerHour.pm
-          ? fd.averageObservationsPerHour
-          : maxAverageObservationsPerHour.pm
-      })
 
 			return {
         hourGroupData: hourGroupData.sort((a, b) => a.hour - b.hour ),
@@ -164,7 +156,7 @@ export default {
 		renderAsterplot () {
 			const that = this
 			const data = this.timePeriod === 'am' ? this.hourGroupData.slice(0, 12) : this.hourGroupData.slice(12)
-			const max = this.maxAverageObservationsPerHour[this.timePeriod]
+			const max = this.maxAverageObservationsPerHour
 			const width = this.svgWrapperRect.width - this.svgMargin.left - this.svgMargin.right
       const height = width / 2
       const radius = Math.min(width, height) / 2
