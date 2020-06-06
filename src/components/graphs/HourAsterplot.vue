@@ -88,6 +88,15 @@ export default {
 			this.timePeriod = this.timePeriod === 'am' ? 'pm' : 'am'
 			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
 			this.renderAsterplot()
+			this.activateClickedPart()
+		},
+		activateClickedPart () {
+			const hourPart = 	this.d3.select(`#${this.svgWrapperSelector} .hour-part.hour-${this.isFiltered}`)
+			if (!hourPart) return
+
+			hourPart.classed('active', true)
+			this.d3.select(`#${this.svgWrapperSelector} .label.hour-${this.isFiltered}`).classed('active', true)
+			this.d3.select(`#${this.svgWrapperSelector} .hour-arc.hour-${this.isFiltered}`).classed('active', true)
 		},
 		getTwoDigitForm (number) {
 			return ('0' + number).slice(-2)
@@ -202,7 +211,9 @@ export default {
         .data(pie(data))
         .enter()
         .append('path')
-        .attr('class', 'hour-part')
+        .attr('class', d => {
+					return `hour-part hour-${d.data.hour}`
+				})
         .attr('d', arc)
         .attr('fill', (d, i) => {
 					return this.colorPalette[i]
@@ -236,10 +247,6 @@ export default {
 						return
 					}
 					
-					that.d3.select(`#${that.svgWrapperSelector} .hour-part.active`).classed('active', false)
-					that.d3.select(`#${that.svgWrapperSelector} .label.active`).classed('active', false)
-					that.d3.select(`#${that.svgWrapperSelector} .hour-arc.active`).classed('active', false)
-					
 					that.d3.select(this).classed('active', true)
 					that.d3.select(`#${that.svgWrapperSelector} .label.hour-${d.data.hour}`).classed('active', true)
 					that.d3.select(`#${that.svgWrapperSelector} .hour-arc.hour-${d.data.hour}`).classed('active', true)
@@ -266,6 +273,7 @@ export default {
 				})
 		},
 		showTooltip (tooltip, d) {
+			tooltip.classed('hidden', true)
 			tooltip
 				.classed('hidden', false)
 				.style('left', `${this.d3.event.offsetX - 50}px`)
@@ -276,7 +284,7 @@ export default {
 				)
 		},
 		setFilter (status, data = undefined) {
-			this.isFiltered = status
+			this.isFiltered = status && data && data.hour.toString()
 			this.svgWrapper.classed('filtered', status)
 			this.$store.commit('setFilterHour', data && data.hour)
 		}
