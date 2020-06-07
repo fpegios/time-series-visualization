@@ -40,7 +40,13 @@ export default {
 		},
 		svgWrapperRect () {
 			return this.svgWrapper.node().getBoundingClientRect()
-		}
+		},
+    filterDateFrom () {
+      return this.$store.getters.filterDateFrom
+    },
+    filterDateTo () {
+      return this.$store.getters.filterDateTo
+    }
 	},
 	watch: {
 		data (value) {
@@ -158,10 +164,19 @@ export default {
     getDayGroupData (data) {
 			if (!data || !data.length) return false
 
-      const dataPerDay = this.getDaysBetweenTwoDates(
-        data[0].date,
-        data[data.length - 1].date
-      )
+			const startDate = this.filterDateFrom.getDate() === data[0].date.getDate()
+        && this.filterDateFrom.getMonth() === data[0].date.getMonth()
+        && this.filterDateFrom.getFullYear() === data[0].date.getFullYear()
+          ? data[0].date
+          : this.filterDateFrom
+
+      const endDate = this.filterDateTo.getDate() === data[data.length - 1].date.getDate()
+        && this.filterDateTo.getMonth() === data[data.length - 1].date.getMonth()
+        && this.filterDateTo.getFullYear() === data[data.length - 1].date.getFullYear()
+          ? data[data.length - 1].date
+          : this.filterDateTo
+
+      const dataPerDay = this.getDaysBetweenTwoDates(startDate, endDate)
       if (!dataPerDay.length) return false
 
       return dataPerDay.map(d => {

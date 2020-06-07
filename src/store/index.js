@@ -10,6 +10,8 @@ export default new Vuex.Store({
       name: undefined,
       data: undefined
     },
+    filterDateFrom: undefined,
+    filterDateTo: undefined,
     filteredData: [],
     filterMonth: undefined,
     filterWeek: undefined,
@@ -27,6 +29,12 @@ export default new Vuex.Store({
     },
     fileData (state) {
       return state.file.data
+    },
+    filterDateFrom (state) {
+      return state.filterDateFrom
+    },
+    filterDateTo (state) {
+      return state.filterDateTo
     },
     filteredData (state) {
       return state.filteredData
@@ -57,6 +65,12 @@ export default new Vuex.Store({
     },
     setFileData (state, value) {
       state.file.data = value
+    },
+    setFilterDateFrom (state, value) {
+      state.filterDateFrom = value
+    },
+    setFilterDateTo (state, value) {
+      state.filterDateTo = value
     },
     setFilteredData (state, value) {
       state.filteredData = value

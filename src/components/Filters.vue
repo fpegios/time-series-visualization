@@ -68,8 +68,8 @@
 					<span v-if="!filteredData.length" class="mr-6 red--text">No data available with the given filters.</span>
 					<span v-if="!days.length" class="red--text">A day option should be selected.</span>
 				</div>
-				<v-btn color="red" outlined @click="onResetFiltersHandler">Reset Filters</v-btn>
-				<v-btn color="red" dark @click="filterData">Find Data</v-btn>
+				<v-btn color="red" small outlined @click="onResetFiltersHandler">Reset Filters</v-btn>
+				<v-btn color="red" small dark @click="filterData">Find Data</v-btn>
 			</v-card-actions>
     </v-card>
   </v-container>
@@ -188,12 +188,13 @@ export default {
 		},
 		filterData () {
 			this.$store.dispatch('showSpinner', true)
-			
-			this.$store.commit('setFilteredData',
-				this.fileData.filter(v => {
-					return this.dateFrom <= v.date && v.date <= this.dateTo && this.filteredDays.includes(v.date.getDay())
-				})
-			)
+			const filteredData = this.fileData.filter(v => {
+				return this.dateFrom <= v.date && v.date <= this.dateTo && this.filteredDays.includes(v.date.getDay())
+			})
+
+			this.$store.commit('setFilteredData', filteredData)
+			this.$store.commit('setFilterDateFrom', this.dateFrom)
+			this.$store.commit('setFilterDateTo', this.dateTo)
 			this.$store.dispatch('showSpinner', false)
 		},
 		onDayPicklistChangeHandler (event) {
@@ -222,6 +223,8 @@ export default {
 			this.dateFromIsoFormatted = this.formatDate(this.dateFromIso)
 			this.dateToIso = new Date(this.fileData[this.fileData.length - 1].date).toISOString().substr(0, 10)
 			this.dateToIsoFormatted = this.formatDate(this.dateToIso)
+			this.$store.commit('setFilterDateFrom', this.dateFrom)
+			this.$store.commit('setFilterDateTo', this.dateTo)
 		}
   },
   created() {
@@ -229,6 +232,8 @@ export default {
   },
   mounted () {
 		this.setDefaultDateRange()
+		this.$store.commit('setFilterDateFrom', this.dateFrom)
+		this.$store.commit('setFilterDateTo', this.dateTo)
 		this.filterData()
   }
 }
