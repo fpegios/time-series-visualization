@@ -7,7 +7,7 @@
             <DayHistogram :data="filteredData"/>
 					</v-col>
 				</v-row>
-				<v-row class="mx-0 mb-6" no-gutters>
+				<v-row class="mx-0 mb-8" no-gutters>
           <v-col cols="6">
             <MonthDonut :data="filteredData"/>
 					</v-col>
@@ -23,9 +23,13 @@
             <HourAsterplot :data="filteredData"/>
 					</v-col>
 				</v-row>
+        <v-row class="mx-0 mt-8 justify-center" no-gutters>
+          <v-col cols="10">
+            <MinuteBarplot :data="filteredData"/>
+          </v-col>
+				</v-row>
       </v-card-text>
     </v-card>
-    {{ filter }}
   </v-container>
 </template>
 
@@ -35,6 +39,7 @@ import MonthDonut from './graphs/MonthDonut.vue'
 import WeekdayDonut from './graphs/WeekdayDonut.vue'
 import WeekBarplot from './graphs/WeekBarplot.vue'
 import HourAsterplot from './graphs/HourAsterplot.vue'
+import MinuteBarplot from './graphs/MinuteBarplot.vue'
 
 export default {
   name: 'Statistics',
@@ -43,7 +48,8 @@ export default {
     MonthDonut,
     WeekdayDonut,
     WeekBarplot,
-    HourAsterplot
+    HourAsterplot,
+    MinuteBarplot
   },
   props: {
   },

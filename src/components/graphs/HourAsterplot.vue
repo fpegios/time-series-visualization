@@ -3,11 +3,8 @@
 		<h2 class="text-center mb-2">{{ title }}</h2>
 		<div :id="svgWrapperSelector" class="d-flex justify-center align-center">
 			<div class="d-flex flex-column justify-center align-center position-absolute">
-				<v-switch class="mx-0 my-0" :messages="timePeriod.toUpperCase()" @change='toggleTimePeriod'></v-switch>
+				<v-switch class="mx-0 my-0" :messages="timePeriod.toUpperCase()" @change="toggleTimePeriod"></v-switch>
 			</div>
-		</div>
-		<div class="d-flex justify-center align-center">
-			<v-btn color="primary" :disabled="!isFiltered">OPEN HOUR OBSERVATIONS</v-btn>
 		</div>
 	</div>
 </template>
@@ -28,6 +25,7 @@ export default {
         bottom: 50,
         left: 20
 			},
+			isModalOpen: false,
 			isFiltered: false,
 			colorPalette: [
         '#E1514B',
@@ -49,7 +47,7 @@ export default {
   computed: {
     d3 () {
       return this.$store.getters.d3
-    },
+		},
     filteredData () {
       return this.data.filter(v => {
 				if (this.filter.month && this.filter.month !== v.date.getMonth()) return false
@@ -77,6 +75,7 @@ export default {
 	},
 	watch: {
 		data () {
+			this.setFilter(false)
 			this.onDataSetHandler(this.filteredData)
 		},
 		filter (newValue, oldValue) {
@@ -236,6 +235,7 @@ export default {
 					tooltip.classed('hidden', true)
 				})
 				.on('click', function (d) {
+					tooltip.classed('hidden', true)
 					const isAlreadyClicked = that.d3.select(this).classed('active')
 
 					that.d3.select(`#${that.svgWrapperSelector} .hour-part.active`).classed('active', false)

@@ -73,6 +73,7 @@ export default {
 	},
 	watch: {
 		data () {
+			this.setFilter(false)
 			this.onDataSetHandler(this.filteredData)
 		},
 		filter (newValue, oldValue) {

@@ -194,7 +194,6 @@ export default {
 					return this.dateFrom <= v.date && v.date <= this.dateTo && this.filteredDays.includes(v.date.getDay())
 				})
 			)
-
 			this.$store.dispatch('showSpinner', false)
 		},
 		onDayPicklistChangeHandler (event) {
@@ -214,7 +213,7 @@ export default {
 			}
 		},
 		onResetFiltersHandler () {
-			this.$store.commit('setFilteredData', this.fileData)
+			this.$store.commit('setFilteredData', [...this.fileData])
 			this.days = ['All Days']
 			this.setDefaultDateRange()
 		},

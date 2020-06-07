@@ -1,29 +1,29 @@
 <template>
 	<div :class="svgWrapperSelector">
-		<h2 class="text-center">{{ title }}</h2>
+		<h2 v-if="filter.hour" class="text-center">{{ title }}</h2>
 		<div :id="svgWrapperSelector"></div>
 	</div>
 </template>
 
 <script>
 export default {
-  name: 'WeekBarplot',
+  name: 'MinuteBarplot',
   props: [
 		'data'
 	],
   data () {
     return {
-			svgWrapperSelector: 'week-barplot',
-			title: 'Day average observations per week',
+			svgWrapperSelector: 'minute-barplot',
+			title: 'Observations per minute',
 			axisLabels: {
-				x: 'Weeks',
+				x: 'Minutes',
 				y: 'Observations'
-			},
+      },
 			svgMargin: {
         top: 40,
-        right: 80,
+        right: 0,
         bottom: 100,
-        left: 100
+        left: 40
 			},
 			isFiltered: false
     }
@@ -31,7 +31,7 @@ export default {
   computed: {
     d3 () {
       return this.$store.getters.d3
-    },
+		},
     filteredData () {
       return this.data.filter(v => {
 				if (this.filter.month && this.filter.month !== v.date.getMonth()) return false
@@ -56,21 +56,57 @@ export default {
 		svgWrapperRect () {
 			return this.svgWrapper.node().getBoundingClientRect()
 		}
-	},
+  },
 	watch: {
 		data () {
-			this.setFilter(false)
+      if (!this.filter.hour) {
+        this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
+        this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
+        return
+      }
 			this.onDataSetHandler(this.filteredData)
 		},
-		filter (newValue, oldValue) {
-			if (oldValue && !this.isFiltered) this.onDataSetHandler(this.filteredData)
+		filter () {
+			if (!this.filter.hour) {
+        this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
+        this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
+        return
+      }
+      this.onDataSetHandler(this.filteredData)
 		}
 	},
   methods: {
+		getTwoDigitForm (number) {
+			return ('0' + number).slice(-2)
+		},
+		onDataSetHandler (data) {
+			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
+			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
+      
+			const minuteGroupData = this.getMinuteGroupData(data)
+      if (!minuteGroupData || !minuteGroupData.length) return
+
+			this.renderBarplot(minuteGroupData)
+    },
+    getMinuteGroupData (data) {
+      const minuteGroupData = []
+      for (let i = 0; i < 60; i++) {
+        minuteGroupData.push({
+          minute: i,
+          numOfObservations: 0
+        })
+      }
+
+      data.forEach(fd => {
+        minuteGroupData[fd.date.getMinutes()].numOfObservations ++
+      })
+
+      return minuteGroupData
+    },
     renderBarplot (data) {
 			const that = this
-			const width = this.svgWrapperRect.width - this.svgMargin.left - this.svgMargin.right
-			const height = width / 2
+      const width = this.svgWrapperRect.width
+			const height = width / 5
 
 			const tooltip = this.svgWrapper
 				.append('div')
@@ -87,17 +123,17 @@ export default {
 			const yAxis = this.d3.svg.axis()
 					.scale(y)
 					.orient('left')
-					.tickSize(5)
+					.tickFormat(this.d3.format('d')).tickSubdivide(0);
 
 			const svg = this.svgWrapper
 				.append('svg')
-				.attr('width', width + this.svgMargin.left + this.svgMargin.right)
+				.attr('width', width)
 				.attr('height', height + this.svgMargin.top + this.svgMargin.bottom)
 				.append('g')
 				.attr('transform',  `translate(${this.svgMargin.left}, ${this.svgMargin.top})`)
 
-			const maxObservations = this.d3.max(data, d => { return d.averageObservationsPerDay })
-			x.domain(data.map(function(d) { return d.weekYear }))
+			const maxObservations = this.d3.max(data, d => { return d.numOfObservations })
+			x.domain(data.map(function(d) { return d.minute }))
 			y.domain([0, maxObservations])
 
 			svg.selectAll('bar')
@@ -106,14 +142,14 @@ export default {
 				.append('rect')
 				.attr('class', 'bar')
 				.attr('x', d => {
-					return x(d.weekYear)
+					return x(d.minute.toString())
 				})
 				.attr('width', x.rangeBand())
 				.attr('y', d => {
-					return y(d.averageObservationsPerDay)
+					return y(d.numOfObservations)
 				})
 				.attr('height', d => {
-					return height - y(d.averageObservationsPerDay)
+					return height - y(d.numOfObservations)
 				})
 				.on('mouseover', function (d) {
 					if (that.svgWrapper.classed('filtered') && !that.d3.select(this).classed('active')) return
@@ -128,21 +164,6 @@ export default {
 					that.d3.select(this).classed('hovered', false)
 					tooltip.classed('hidden', true)
 				})
-				.on('click', function (d) {
-					const isAlreadyClicked = that.d3.select(this).classed('active')
-
-					that.d3.select(`#${that.svgWrapperSelector} .bar.active`).classed('active', false)
-					
-					if (isAlreadyClicked) {
-						that.setFilter(false)
-						return
-					}
-					
-					that.d3.select(`#${that.svgWrapperSelector} .bar.active`).classed('active', false)
-					
-					that.d3.select(this).classed('active', true)
-					that.setFilter(true, d)
-				})
 			
 			svg.append('g')
 				.attr('class', 'axis axis-x')
@@ -150,15 +171,15 @@ export default {
 				.call(xAxis)
 				.selectAll('text')
 				.style('text-anchor', 'center')
-        .attr('dx', '-45')
-				.attr('dy', '2')
-				.attr('transform', 'rotate(-75)')
+        .attr('dx', '-3')
+				.attr('dy', '10')
 				.attr('style', 'font-size: 0.7em')
 
 			svg.select('.axis-x')
 				.append('text')
         .attr('class', 'axis-label')
-        .attr('x', width / 2 - 40)
+				.style('text-anchor', 'center')
+        .attr('x', width / 2 - 60)
         .attr('y', 85)
         .text(this.axisLabels.x)
 
@@ -173,7 +194,7 @@ export default {
 				.text(this.axisLabels.y)
 				
 			// draw line of mean number of observations
-			const meanObservations = data.reduce((accum, item) => accum + item.averageObservationsPerDay, 0) / data.length
+			const meanObservations = data.reduce((accum, item) => accum + item.numOfObservations, 0) / data.length
 			const meanLineHeight = height - (meanObservations / maxObservations) * height
 
 			svg.append('line')
@@ -185,63 +206,18 @@ export default {
 				.attr('stroke', '#f44336')
 				.attr('stroke-width', 2)
     },
-		onDataSetHandler (data) {
-			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
-			this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
-			
-			const weekGroupData = this.getWeekGroupData(data)
-      if (!weekGroupData || !weekGroupData.length) return
-      
-			this.renderBarplot(weekGroupData)
-		},
-    getWeekGroupData (data) {
-			if (!data || !data.length) return false
-
-      const weekGroupData = []
-			data.forEach(fd => {
-        const week = fd.week
-        const weekYear = `${week}/${fd.date.getFullYear()}`
-				const weekGroup = weekGroupData.find(mgd => mgd.weekYear === weekYear)
-				const dateString = `${fd.date.getDate()}-${fd.date.getMonth() + 1}-${fd.date.getFullYear()}`
-
-				if (weekGroup) {
-					if (!weekGroup.dates.includes(dateString)) {
-						weekGroup.dates.push(dateString)
-					}
-					weekGroup.numOfObservations++
-				} else {
-					weekGroupData.push({
-            week,
-						weekYear,
-						dates: [dateString],
-						numOfObservations: 1,
-						get averageObservationsPerDay () {
-							return this.numOfObservations / this.dates.length
-						}
-					})
-				}
-      })
-      return weekGroupData
-    },
 		showTooltip (tooltip, d) {
 			tooltip
 				.classed('hidden', false)
 				.style('left', `${this.d3.event.offsetX - 40}px`)
 				.style('top', `${this.d3.event.offsetY - 60}px`)
 				.html(
-					`<span>${d.weekYear}</span>` +
-					`<span>${d.averageObservationsPerDay.toFixed(1)} observations/day</span>`
+					`<span>Minute: ${this.getTwoDigitForm(d.minute)}</span>` +
+					`<span>${d.numOfObservations} observations</span>`
 				)
 		},
-		setFilter (status, data = undefined) {
-			this.isFiltered = status
-			this.svgWrapper.classed('filtered', status)
-			this.$store.commit('setFilterWeek', data && data.week)
-		}
   },
   mounted () {
-		this.setFilter(false)
-		this.onDataSetHandler(this.filteredData)
   }
 }
 </script>
@@ -249,7 +225,7 @@ export default {
 <style lang="scss">
 @import "./../../scss/_colors";
 
-.week-barplot {
+.minute-barplot {
 	position: relative;
 
 	.bar {
@@ -270,14 +246,6 @@ export default {
 
 	.axis-label {
 		font-size: 1.1em;
-	}
-	
-	.filtered {
-		.bar {
-			&:not(.active) {
-				opacity: .15;
-			}
-		}
 	}
 
 	.tooltip {
