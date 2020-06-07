@@ -137,6 +137,8 @@ export default {
   watch: {
     filteredData () {
       this.shift = 0
+      this.maxNumOfObservations_hour = 0
+      this.maxNumOfObservations_day = 0
 			this.onDataSetHandler(this.filteredData)
 		}
   },
