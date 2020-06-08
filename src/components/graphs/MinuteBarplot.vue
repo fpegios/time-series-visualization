@@ -231,7 +231,6 @@ export default {
 	.bar {
 		fill: $cyan!important;
 		shape-rendering: crispEdges;
-		cursor: pointer;
 		&.hovered {
 			fill: darken($cyan, 10%)!important;
 		}
