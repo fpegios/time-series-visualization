@@ -1,90 +1,94 @@
 <template>
   <v-container id="calendar">
     <v-card max-width="100%">
-      <v-row class="mx-0">
-        <v-col cols="12" class="d-flex flex-grow">
-          <div v-if="leftIndex > 0" class="d-flex align-center mb-12">
-            <v-icon class="arrow" color="cyan lighten-1" @click="onArrowClickHandler(-1)">arrow_left</v-icon>
-          </div>
-          <div v-else class="d-flex align-center mb-12">
-            <v-icon class="arrow disabled" color="grey">arrow_left</v-icon>
-          </div>
+      <v-card-text>
+        <h2 class="text-center">{{ title }}</h2>
 
-          <div class="flex-grow-1">
-            <div class="calendar-table">
-              <div class="calendar-table__column label mr-1" :style="columnWidth">
-                <div class="header"></div>
-                <div class="hour" v-for="(hour, index) in hours" :key="index">
-                  <span>{{ getTwoDigitForm(index) }}:00</span>
+        <v-row class="mx-0">
+          <v-col cols="12" class="d-flex flex-grow">
+            <div v-if="leftIndex > 0" class="d-flex align-center mb-12">
+              <v-icon class="arrow" color="cyan lighten-1" @click="onArrowClickHandler(-1)">arrow_left</v-icon>
+            </div>
+            <div v-else class="d-flex align-center mb-12">
+              <v-icon class="arrow disabled" color="grey">arrow_left</v-icon>
+            </div>
+
+            <div class="flex-grow-1">
+              <div class="calendar-table">
+                <div class="calendar-table__column label mr-1" :style="columnWidth">
+                  <div class="header"></div>
+                  <div class="hour" v-for="(hour, index) in hours" :key="index">
+                    <span>{{ getTwoDigitForm(index) }}:00</span>
+                  </div>
+                </div>
+                <div class="calendar-table__column" :style="columnWidth" v-for="d in data" :key="d.id">
+                  <div class="header" :class="{ weekend: isWeekend(d.date) }">
+                    <span>{{ getWeekday(d.date) }}</span>
+                    <span>{{ getDateFormat(d.date) }}</span>
+                  </div>
+                  <div class="hour" :class="getHourClass(d.date, hour.numOfObservations)" v-for="hour in d.hourGroupData" :key="hour.id">
+                    <span>{{ hour.numOfObservations }}</span>
+                  </div>
                 </div>
               </div>
-              <div class="calendar-table__column" :style="columnWidth" v-for="d in data" :key="d.id">
-                <div class="header" :class="{ weekend: isWeekend(d.date) }">
-                  <span>{{ getWeekday(d.date) }}</span>
-                  <span>{{ getDateFormat(d.date) }}</span>
+
+              <div class="d-flex justify-end my-5">
+                <div class="legend">
+                  <div class="legend-parts d-flex">
+                    <div class="gradient-0"></div>
+                    <div class="gradient-1"></div>
+                    <div class="gradient-2"></div>
+                    <div class="gradient-3"></div>
+                    <div class="gradient-4"></div>
+                    <div class="gradient-5"></div>
+                    <div class="gradient-6"></div>
+                  </div>
+                  <div class="d-flex justify-space-between">
+                    <span>1</span>
+                    <span>{{ maxNumOfObservations_hour }}</span>
+                  </div>
                 </div>
-                <div class="hour" :class="getHourClass(d.date, hour.numOfObservations)" v-for="hour in d.hourGroupData" :key="hour.id">
-                  <span>{{ hour.numOfObservations }}</span>
+              </div>
+
+              <div class="calendar-table">
+                <div class="calendar-table__column label mr-1" :style="columnWidth">
+                  <span class="hour">Total</span>
+                </div>
+                <div class="calendar-table__column" :style="columnWidth" v-for="d in data" :key="d.id">
+                  <div class="hour total" :class="getDayClass(d.date, d.totalNumOfObservations)">
+                    <span>{{ d.totalNumOfObservations }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-end mt-5">
+                <div class="legend">
+                  <div class="legend-parts d-flex">
+                    <div class="gradient-0"></div>
+                    <div class="gradient-1"></div>
+                    <div class="gradient-2"></div>
+                    <div class="gradient-3"></div>
+                    <div class="gradient-4"></div>
+                    <div class="gradient-5"></div>
+                    <div class="gradient-6"></div>
+                  </div>
+                  <div class="d-flex justify-space-between">
+                    <span>1</span>
+                    <span>{{ maxNumOfObservations_day }}</span>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <div class="d-flex justify-end my-5">
-              <div class="legend">
-                <div class="legend-parts d-flex">
-                  <div class="gradient-0"></div>
-                  <div class="gradient-1"></div>
-                  <div class="gradient-2"></div>
-                  <div class="gradient-3"></div>
-                  <div class="gradient-4"></div>
-                  <div class="gradient-5"></div>
-                  <div class="gradient-6"></div>
-                </div>
-                <div class="d-flex justify-space-between">
-                  <span>1</span>
-                  <span>{{ maxNumOfObservations_hour }}</span>
-                </div>
-              </div>
+            
+            <div v-if="rightIndex < dayGroupData.length" class="d-flex align-center mb-12">
+              <v-icon class="arrow" color="cyan lighten-1" @click="onArrowClickHandler(1)">arrow_right</v-icon>
             </div>
-
-            <div class="calendar-table">
-              <div class="calendar-table__column label mr-1" :style="columnWidth">
-                <span class="hour">Total</span>
-              </div>
-              <div class="calendar-table__column" :style="columnWidth" v-for="d in data" :key="d.id">
-                <div class="hour total" :class="getDayClass(d.date, d.totalNumOfObservations)">
-                  <span>{{ d.totalNumOfObservations }}</span>
-                </div>
-              </div>
+            <div v-else class="d-flex align-center mb-12">
+              <v-icon class="arrow disabled" color="grey">arrow_right</v-icon>
             </div>
-
-            <div class="d-flex justify-end mt-5">
-              <div class="legend">
-                <div class="legend-parts d-flex">
-                  <div class="gradient-0"></div>
-                  <div class="gradient-1"></div>
-                  <div class="gradient-2"></div>
-                  <div class="gradient-3"></div>
-                  <div class="gradient-4"></div>
-                  <div class="gradient-5"></div>
-                  <div class="gradient-6"></div>
-                </div>
-                <div class="d-flex justify-space-between">
-                  <span>1</span>
-                  <span>{{ maxNumOfObservations_day }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div v-if="rightIndex < dayGroupData.length" class="d-flex align-center mb-12">
-            <v-icon class="arrow" color="cyan lighten-1" @click="onArrowClickHandler(1)">arrow_right</v-icon>
-          </div>
-          <div v-else class="d-flex align-center mb-12">
-            <v-icon class="arrow disabled" color="grey">arrow_right</v-icon>
-          </div>
-        </v-col>
-      </v-row>
+          </v-col>
+        </v-row>
+      </v-card-text>
     </v-card> 
   </v-container>
 </template>
@@ -94,6 +98,7 @@ export default {
   name: 'Calendar',
   data () {
     return {
+      title: 'Calendar',
       maxCells: 30,
       shift: 0,
       dayGroupData: [],
@@ -125,14 +130,17 @@ export default {
       return this.maxCells - 1 + this.shift
     },
     columnWidth () {
-      return `width: ${(100 / (this.maxCells + 1))}%`
+      return `width: 100%; min-width: ${(100 / (this.maxCells + 1))}%`
     },
     filterDateFrom () {
       return this.$store.getters.filterDateFrom
     },
     filterDateTo () {
       return this.$store.getters.filterDateTo
-    }
+    },
+    filterDays() {
+      return this.$store.getters.filterDays
+    },
   },
   watch: {
     filteredData () {
@@ -188,7 +196,23 @@ export default {
       for (arr = [], dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
         arr.push(new Date(dt));
       }
-      return arr
+
+      // filter on days
+      return arr.filter(d => {
+        if (this.filterDays.includes('All Days')) return true
+
+        if (d.getDay() === 1 && this.filterDays.includes('Mondays')) return true
+        if (d.getDay() === 2 && this.filterDays.includes('Tuesdays')) return true
+        if (d.getDay() === 3 && this.filterDays.includes('Wednesdays')) return true
+        if (d.getDay() === 4 && this.filterDays.includes('Thursdays')) return true
+        if (d.getDay() === 5 && this.filterDays.includes('Fridays')) return true
+        if (d.getDay() === 6 && this.filterDays.includes('Saturdays')) return true
+        if (d.getDay() === 0 && this.filterDays.includes('Sundays')) return true
+        if (d.getDay() > 0 && d.getDay() < 6 && this.filterDays.includes('Weekdays')) return true
+        if ((d.getDay() > 5 || d.getDay() < 1) && this.filterDays.includes('Weekends')) return true
+
+        return false
+      })
     },
     getDayGroupData (data) {
 			if (!data || !data.length) return false
@@ -361,6 +385,10 @@ export default {
       margin-right: 5px;
     }
   }
+}
+
+span {
+  line-height: inherit;
 }
   
 .gradient-0 {

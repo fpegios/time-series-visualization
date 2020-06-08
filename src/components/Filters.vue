@@ -193,6 +193,7 @@ export default {
 			})
 
 			this.$store.commit('setFilteredData', filteredData)
+			this.$store.commit('setFilterDays', this.days)
 			this.$store.commit('setFilterDateFrom', this.dateFrom)
 			this.$store.commit('setFilterDateTo', this.dateTo)
 			this.$store.dispatch('showSpinner', false)
@@ -223,6 +224,7 @@ export default {
 			this.dateFromIsoFormatted = this.formatDate(this.dateFromIso)
 			this.dateToIso = new Date(this.fileData[this.fileData.length - 1].date).toISOString().substr(0, 10)
 			this.dateToIsoFormatted = this.formatDate(this.dateToIso)
+			this.$store.commit('setFilterDays', this.days)
 			this.$store.commit('setFilterDateFrom', this.dateFrom)
 			this.$store.commit('setFilterDateTo', this.dateTo)
 		}
