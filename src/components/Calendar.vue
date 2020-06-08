@@ -388,7 +388,7 @@ export default {
 }
 
 span {
-  line-height: inherit;
+  line-height: 1.5em;
 }
   
 .gradient-0 {
