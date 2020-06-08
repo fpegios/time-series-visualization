@@ -15,13 +15,13 @@
 
             <div class="flex-grow-1">
               <div class="calendar-table">
-                <div class="calendar-table__column label mr-1" :style="columnWidth">
+                <div class="calendar-table__column label mr-1" :style="getColumnWidth(1)">
                   <div class="header"></div>
                   <div class="hour" v-for="(hour, index) in hours" :key="index">
                     <span>{{ getTwoDigitForm(index) }}:00</span>
                   </div>
                 </div>
-                <div class="calendar-table__column" :style="columnWidth" v-for="d in data" :key="d.id">
+                <div class="calendar-table__column" :style="getColumnWidth()" v-for="d in data" :key="d.id">
                   <div class="header" :class="{ weekend: isWeekend(d.date) }">
                     <span>{{ getWeekday(d.date) }}</span>
                     <span>{{ getDateFormat(d.date) }}</span>
@@ -51,10 +51,10 @@
               </div>
 
               <div class="calendar-table">
-                <div class="calendar-table__column label mr-1" :style="columnWidth">
+                <div class="calendar-table__column label mr-1" :style="getColumnWidth(1)">
                   <span class="hour">Total</span>
                 </div>
-                <div class="calendar-table__column" :style="columnWidth" v-for="d in data" :key="d.id">
+                <div class="calendar-table__column" :style="getColumnWidth()" v-for="d in data" :key="d.id">
                   <div class="hour total" :class="getDayClass(d.date, d.totalNumOfObservations)">
                     <span>{{ d.totalNumOfObservations }}</span>
                   </div>
@@ -129,9 +129,6 @@ export default {
     rightIndex () {
       return this.maxCells - 1 + this.shift
     },
-    columnWidth () {
-      return `width: 100%; min-width: ${(100 / (this.maxCells + 1))}%`
-    },
     filterDateFrom () {
       return this.$store.getters.filterDateFrom
     },
@@ -151,6 +148,9 @@ export default {
 		}
   },
   methods: {
+    getColumnWidth (label = undefined) {
+      return `width: 100%; ${label ? 'max-width' : 'min-width'}: ${(100 / (this.maxCells + 1))}%`
+    },
 		getTwoDigitForm (number) {
 			return ('0' + number).slice(-2)
 		},
@@ -336,6 +336,7 @@ export default {
     }
 
     &.label {
+      width: auto;
       .header,
       .hour {
         font-size: .75em;
