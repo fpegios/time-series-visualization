@@ -1,6 +1,6 @@
 <template>
 	<div :class="svgWrapperSelector">
-		<h2 v-if="filter.hour" class="text-center">{{ title }}</h2>
+		<h2 v-if="filter.hour !== undefined" class="text-center">{{ title }}</h2>
 		<div :id="svgWrapperSelector"></div>
 	</div>
 </template>
@@ -21,9 +21,9 @@ export default {
       },
 			svgMargin: {
         top: 40,
-        right: 0,
+        right: 60,
         bottom: 100,
-        left: 40
+        left: 60
 			},
 			isFiltered: false
     }
@@ -59,7 +59,7 @@ export default {
   },
 	watch: {
 		data () {
-      if (!this.filter.hour) {
+      if (this.filter.hour === undefined) {
         this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
         this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
         return
@@ -67,11 +67,11 @@ export default {
 			this.onDataSetHandler(this.filteredData)
 		},
 		filter () {
-			if (!this.filter.hour) {
+			if (this.filter.hour === undefined) {
         this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
         this.d3.select(`#${this.svgWrapperSelector} .tooltip`).remove()
         return
-      }
+			}
       this.onDataSetHandler(this.filteredData)
 		}
 	},
@@ -105,7 +105,7 @@ export default {
     },
     renderBarplot (data) {
 			const that = this
-      const width = this.svgWrapperRect.width
+      const width = this.svgWrapperRect.width - this.svgMargin.right
 			const height = width / 5
 
 			const tooltip = this.svgWrapper
@@ -127,7 +127,7 @@ export default {
 
 			const svg = this.svgWrapper
 				.append('svg')
-				.attr('width', width)
+				.attr('width', width + this.svgMargin.left + this.svgMargin.right)
 				.attr('height', height + this.svgMargin.top + this.svgMargin.bottom)
 				.append('g')
 				.attr('transform',  `translate(${this.svgMargin.left}, ${this.svgMargin.top})`)

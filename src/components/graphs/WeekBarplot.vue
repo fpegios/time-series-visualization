@@ -229,7 +229,7 @@ export default {
 				.style('left', `${this.d3.event.offsetX - 40}px`)
 				.style('top', `${this.d3.event.offsetY - 60}px`)
 				.html(
-					`<span>${d.weekYear}</span>` +
+					`<span>Week: ${d.weekYear}</span>` +
 					`<span>${d.averageObservationsPerDay.toFixed(1)} observations/day</span>`
 				)
 		},

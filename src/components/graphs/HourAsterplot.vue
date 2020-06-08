@@ -79,7 +79,7 @@ export default {
 			this.onDataSetHandler(this.filteredData)
 		},
 		filter (newValue, oldValue) {
-			if (oldValue && !this.isFiltered) this.onDataSetHandler(this.filteredData)
+			if (oldValue && this.isFiltered === false) this.onDataSetHandler(this.filteredData)
 		}
 	},
   methods: {
@@ -279,14 +279,14 @@ export default {
 				.style('left', `${this.d3.event.offsetX - 50}px`)
 				.style('top', `${this.d3.event.offsetY - 40}px`)
 				.html(
-					`<span>${this.getHouRange(d.data.hour)}</span>` +
+					`<span>Hour: ${this.getHouRange(d.data.hour)}</span>` +
 					`<span>${d.data.averageObservationsPerHour.toFixed(1)} observations/day</span>`
 				)
 		},
 		setFilter (status, data = undefined) {
 			this.isFiltered = status && data && data.hour.toString()
 			this.svgWrapper.classed('filtered', status)
-			this.$store.commit('setFilterHour', data && data.hour)
+			this.$store.commit('setFilterHour', data && data.hour !== undefined && data.hour)
 		}
   },
   mounted () {
