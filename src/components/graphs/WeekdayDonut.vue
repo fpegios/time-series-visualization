@@ -171,6 +171,7 @@ export default {
 				.style('fill', d => { return color(d.data.weekdayName) })
 				.attr('class', 'slice')
 				.on('mouseover', function (d) {
+					this.parentNode.appendChild(this)
 					if (that.svgWrapper.classed('filtered') && !that.d3.select(this).classed('active')) return
 					that.d3.select(this).classed('hovered', true)
 					that.showTooltip(tooltip, d)

@@ -221,7 +221,7 @@ export default {
 					return this.colorPalette[i]
 				})
 				.on('mouseover', function (d) {
-					this.parentNode.appendChild(this);
+					this.parentNode.appendChild(this)
 					if (that.svgWrapper.classed('filtered') && !that.d3.select(this).classed('active')) return
 					that.d3.select(this).classed('hovered', true)
 					that.showTooltip(tooltip, d)
