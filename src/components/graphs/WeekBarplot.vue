@@ -259,6 +259,9 @@ export default {
 		&.hovered {
 			fill: darken($cyan, 10%)!important;
 		}
+		&.active {
+			stroke: black;
+		}
 	}
 
 	.axis path,

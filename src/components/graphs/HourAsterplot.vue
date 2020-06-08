@@ -323,8 +323,11 @@ export default {
 
 	.hour-part {
 		cursor: pointer;
+		stroke-width: 2px;
 		&.hovered {
-			stroke-width: 2px;
+			stroke: black;
+		}
+		&.active {
 			stroke: black;
 		}
 	}

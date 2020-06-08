@@ -328,6 +328,9 @@ export default {
 		&.hovered {
 			stroke: black;
 		}
+		&.active {
+			stroke: black;
+		}
 	}
 
 	polyline {
