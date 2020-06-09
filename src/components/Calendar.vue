@@ -5,7 +5,7 @@
         <h2 class="text-center">{{ title }}</h2>
 
         <v-row class="mx-0">
-          <v-col cols="12" class="d-flex flex-grow">
+          <v-col cols="12" class="d-flex flex-grow px-0">
             <div v-if="leftIndex > 0" class="d-flex align-center mb-12">
               <v-icon class="arrow" color="cyan lighten-1" @click="onArrowClickHandler(-1)">arrow_left</v-icon>
             </div>
@@ -301,7 +301,7 @@ export default {
       border-left: 1px solid $grey;
       border-bottom: 1px solid $grey;
       text-align: center;
-      height: 30px;
+      height: 40px;
 
       &.weekend {
         background-color: darken($color: $cyan, $amount: 10);
@@ -327,11 +327,12 @@ export default {
     }
 
     .header {
-      font-size: .65em;
+      font-size: .8em;
       font-weight: bold;
     }
+
     .hour {
-      font-size: .75em;
+      font-size: 1em;
       font-weight: bold;
     }
 
@@ -357,8 +358,8 @@ export default {
 
 .arrow {
   cursor: pointer;
-  font-size: 120px!important;
-  max-width: 40px;
+  font-size: 100px!important;
+  max-width: 30px;
 
   &:not(.disabled) {
     &:hover {
