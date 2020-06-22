@@ -24,7 +24,13 @@
 											v-on="on">
 										</v-text-field>
 									</template>
-									<v-date-picker v-model="dateFromIso" no-title @input="dateFromMenu = false"></v-date-picker>
+									<v-date-picker
+										v-model="dateFromIso"
+										no-title 
+										@input="dateFromMenu = false"
+										:min="fileData[0].date.toISOString()"
+										:max="fileData[fileData.length - 1].date.toISOString()">
+									</v-date-picker>
 								</v-menu>
 							</v-col>
 
@@ -41,7 +47,13 @@
 											@change="dateToIso = parseDate(dateToIsoFormatted)">
 										</v-text-field>
 									</template>
-									<v-date-picker v-model="dateToIso" no-title @input="dateToMenu = false"></v-date-picker>
+									<v-date-picker
+										v-model="dateToIso"
+										no-title
+										@input="dateToMenu = false"
+										:min="fileData[0].date.toISOString()"
+										:max="fileData[fileData.length - 1].date.toISOString()">
+									</v-date-picker>
 								</v-menu>
 							</v-col>
 						</v-row>
