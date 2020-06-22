@@ -27,7 +27,8 @@
                     <span>{{ getDateFormat(d.date) }}</span>
                   </div>
                   <div class="hour" :class="getHourClass(d.date, hour.numOfObservations)" v-for="hour in d.hourGroupData" :key="hour.id">
-                    <span>{{ hour.numOfObservations }}</span>
+                    <span v-if="hour.numOfObservations === 0">-</span>
+                    <span v-else>{{ hour.numOfObservations }}</span>
                   </div>
                 </div>
               </div>
@@ -56,7 +57,8 @@
                 </div>
                 <div class="calendar-table__column" :style="getColumnWidth()" v-for="d in data" :key="d.id">
                   <div class="hour total" :class="getDayClass(d.date, d.totalNumOfObservations)">
-                    <span>{{ d.totalNumOfObservations }}</span>
+                    <span v-if="d.totalNumOfObservations === 0">-</span>
+                    <span v-else>{{ d.totalNumOfObservations }}</span>
                   </div>
                 </div>
               </div>
