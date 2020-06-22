@@ -76,19 +76,6 @@ export default {
 				.append('div')
         .attr('class', 'tooltip hidden')
 
-			const x = this.d3.scale.ordinal().rangeRoundBands([0, width], .05);
-			const y = this.d3.scale.linear().range([height, 0])
-
-			const xAxis = this.d3.svg.axis()
-					.scale(x)
-					.orient('bottom')
-					.tickSize(5)
-
-			const yAxis = this.d3.svg.axis()
-					.scale(y)
-					.orient('left')
-					.tickSize(5)
-
 			const svg = this.svgWrapper
 				.append('svg')
 				.attr('width', width + this.svgMargin.left + this.svgMargin.right)
@@ -96,8 +83,21 @@ export default {
 				.append('g')
 				.attr('transform',  `translate(${this.svgMargin.left}, ${this.svgMargin.top})`)
 
-			const maxObservations = this.d3.max(data, d => { return d.averageObservationsPerDay })
-			x.domain(data.map(function(d) { return d.weekYear }))
+			const x = this.d3.scale.ordinal().rangeRoundBands([0, width], .05);
+			const y = this.d3.scale.linear().range([height, 0])
+
+			const xAxis = this.d3.svg.axis()
+				.scale(x)
+				.orient('bottom')
+				.tickSize(5)
+
+			const yAxis = this.d3.svg.axis()
+				.scale(y)
+				.orient('left')
+				.tickSize(5)
+
+			const maxObservations = this.d3.max(data, d => d.averageObservationsPerDay )
+			x.domain(data.map(d => d.weekYear ))
 			y.domain([0, maxObservations])
 
 			svg.selectAll('bar')
@@ -105,16 +105,10 @@ export default {
 				.enter()
 				.append('rect')
 				.attr('class', 'bar')
-				.attr('x', d => {
-					return x(d.weekYear)
-				})
+				.attr('x', d => x(d.weekYear))
 				.attr('width', x.rangeBand())
-				.attr('y', d => {
-					return y(d.averageObservationsPerDay)
-				})
-				.attr('height', d => {
-					return height - y(d.averageObservationsPerDay)
-				})
+				.attr('y', d => y(d.averageObservationsPerDay))
+				.attr('height', d => height - y(d.averageObservationsPerDay))
 				.on('mouseover', function (d) {
 					if (that.svgWrapper.classed('filtered') && !that.d3.select(this).classed('active')) return
 					that.d3.select(this).classed('hovered', true)

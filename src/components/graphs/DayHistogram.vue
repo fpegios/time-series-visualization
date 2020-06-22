@@ -19,6 +19,7 @@ export default {
 				x: 'Days',
 				y: 'Observations'
 			},
+			isFiltered: false,
 			svgMargin: {
         top: 20,
         right: 30,
@@ -33,7 +34,22 @@ export default {
       return this.$store.getters.d3
     },
     filteredData () {
-      return this.$store.getters.filteredData
+      return this.data.filter(v => {
+				if (this.filter.month && this.filter.month !== v.date.getMonth()) return false
+				if (this.filter.week && this.filter.week !== v.week) return false
+				if (this.filter.weekday && this.filter.weekday !== v.date.getDay()) return false
+				if (this.filter.hour && this.filter.hour !== v.date.getHours()) return false
+				
+				return true
+			})
+		},
+    filter () {
+      return {
+				month: this.$store.getters.filterMonth,
+				week: this.$store.getters.filterWeek,
+				weekday: this.$store.getters.filterWeekday,
+				hour: this.$store.getters.filterHour
+			}
 		},
 		svgWrapper () {
 			return this.d3.select(`#${this.svgWrapperSelector}`)
@@ -49,11 +65,25 @@ export default {
     }
 	},
 	watch: {
-		data (value) {
-			this.onDataSetHandler(value)
+		data () {
+			this.onDataSetHandler(this.filteredData)
+		},
+		filter (newValue, oldValue) {
+			if (oldValue && !this.isFiltered) this.onDataSetHandler(this.filteredData)
 		}
 	},
   methods: {
+    getWeek (d) {
+      // Source: https://weeknumber.net/how-to/javascript
+      const date = new Date(d)
+      date.setHours(0, 0, 0, 0)
+      // Thursday in current week decides the year.
+      date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7)
+      // January 4 is always in week 1.
+      const week1 = new Date(date.getFullYear(), 0, 4);
+      // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+      return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7)
+    },
     renderHistogram (data) {			
       const width = this.svgWrapperRect.width - this.svgMargin.left - this.svgMargin.right
 			const height = this.svgHeight - this.svgMargin.top - this.svgMargin.bottom
@@ -69,15 +99,22 @@ export default {
         .append('g')
         .attr('transform', `translate(${this.svgMargin.left}, ${this.svgMargin.top})`);
 
-      // Set x (timeseries) and y (linear) scales
-      const xScale = this.d3.time.scale().range([0, width]);
-      const yScale = this.d3.scale.linear().range([height, 0]);
+			const x = this.d3.time.scale().range([0, width]);
+			const y = this.d3.scale.linear().range([height, 0])
+			
+      const xAxis = this.d3.svg.axis().scale(x).orient('bottom')
+        .tickFormat(this.d3.time.format('%d %b %y'))
+        .tickSize(5)
+      
+			const yAxis = this.d3.svg.axis().scale(y).orient('left')
+				.ticks(6)
+        .tickSize(5)
 
       // Set the x and y scales to the data ranges x based on min and
 			// max date range (this.d3.extent()) and y based on 0 to max value
 			const maxObservations = this.d3.max(data, d => d.numOfObservations)
-      xScale.domain(this.d3.extent(data, d => d.date))
-			yScale.domain([0, maxObservations])
+      x.domain(this.d3.extent(data, d => d.date))
+			y.domain([0, maxObservations])
 
       // Create bar and append data.close and x position set based on barWidth equidistant
       const barWidth = width / data.length
@@ -92,9 +129,9 @@ export default {
       // Add rectangles to bar 
       bar.append('rect')
         .attr('class', 'bar')
-        .attr('y', d => yScale(d.numOfObservations))
+        .attr('y', d => y(d.numOfObservations))
         .attr('width', barWidth - 2)
-				.attr('height', d => height - yScale(d.numOfObservations))
+				.attr('height', d => height - y(d.numOfObservations))
 				.on('mouseover', function (d) {
 					that.d3.select(this).classed('hovered', true)
 					that.showTooltip(tooltip, d)
@@ -106,11 +143,6 @@ export default {
 					that.d3.select(this).classed('hovered', false)
 					tooltip.classed('hidden', true)
 				})
-
-      // Add the axis 
-      const xAxis = this.d3.svg.axis().scale(xScale).orient('bottom')
-        .tickFormat(this.d3.time.format('%d %b %y'))
-        .tickSize(5)
 
       svg.append('g')
         .attr('class', 'axis axis-x')
@@ -126,11 +158,7 @@ export default {
         .attr('class', 'axis-label')
         .attr('x', width / 2 - 40)
         .attr('y', 55)
-        .text(this.axisLabels.x);
-      
-			const yAxis = this.d3.svg.axis().scale(yScale).orient('left')
-				.ticks(6)
-        .tickSize(5)
+        .text(this.axisLabels.x)
 
       svg.append('g')
         .attr('class', 'axis axis-y')
@@ -177,19 +205,30 @@ export default {
           : this.filterDateTo
 
       const dataPerDay = this.getDaysBetweenTwoDates(startDate, endDate)
-      if (!dataPerDay.length) return false
+			if (!dataPerDay.length) return false
 
-      return dataPerDay.map(d => {
-        d.date = d
-        const observationsByDate = data.filter(fd =>
-          fd.date.getDate() === d.getDate()
-          && fd.date.getMonth() === d.getMonth()
-          && fd.date.getFullYear() === d.getFullYear()
-        )
-        d.numOfObservations = observationsByDate ? observationsByDate.length : 0
+			const res = dataPerDay
+				.filter(v => {
+					if (this.filter.month && this.filter.month !== v.getMonth()) return false
+					if (this.filter.week && this.filter.week !== this.getWeek(v)) return false
+					if (this.filter.weekday && this.filter.weekday !== v.getDay()) return false
+					
+					return true
+				})
+				.map(d => {
+					d.date = d
+					const observationsByDate = data.filter(fd =>
+						fd.date.getDate() === d.getDate()
+						&& fd.date.getMonth() === d.getMonth()
+						&& fd.date.getFullYear() === d.getFullYear()
+					)
+					
+					d.numOfObservations = observationsByDate.length
 
-        return d
-      })
+					return d
+				})
+			
+				return res
 		},
 		onDataSetHandler (data) {
 			this.d3.select(`#${this.svgWrapperSelector} svg`).remove()
@@ -212,7 +251,7 @@ export default {
 		}
   },
   mounted () {
-		this.onDataSetHandler(this.data)
+		this.onDataSetHandler(this.filteredData)
   }
 }
 </script>
