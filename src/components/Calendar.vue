@@ -32,6 +32,17 @@
                 </div>
               </div>
 
+              <div class="calendar-table">
+                <div class="calendar-table__column label mr-1" :style="getColumnWidth(1)">
+                  <span class="hour">Total</span>
+                </div>
+                <div class="calendar-table__column" :style="getColumnWidth()" v-for="d in data" :key="d.id">
+                  <div class="hour total" :class="getDayClass(d.date, d.totalNumOfObservations)">
+                    <span>{{ d.totalNumOfObservations || '-'}}</span>
+                  </div>
+                </div>
+              </div>
+
               <div class="d-flex justify-end my-5">
                 <div class="legend">
                   <div class="legend-parts d-flex">
@@ -44,37 +55,8 @@
                     <div class="gradient-6"></div>
                   </div>
                   <div class="d-flex justify-space-between">
-                    <span>1</span>
-                    <span>{{ maxNumOfObservations_hour }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="calendar-table">
-                <div class="calendar-table__column label mr-1" :style="getColumnWidth(1)">
-                  <span class="hour">Total</span>
-                </div>
-                <div class="calendar-table__column" :style="getColumnWidth()" v-for="d in data" :key="d.id">
-                  <div class="hour total" :class="getDayClass(d.date, d.totalNumOfObservations)">
-                    <span>{{ d.totalNumOfObservations || '-'}}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex justify-end mt-5">
-                <div class="legend">
-                  <div class="legend-parts d-flex">
-                    <div class="gradient-0"></div>
-                    <div class="gradient-1"></div>
-                    <div class="gradient-2"></div>
-                    <div class="gradient-3"></div>
-                    <div class="gradient-4"></div>
-                    <div class="gradient-5"></div>
-                    <div class="gradient-6"></div>
-                  </div>
-                  <div class="d-flex justify-space-between">
-                    <span>1</span>
-                    <span>{{ maxNumOfObservations_day }}</span>
+                    <span>min</span>
+                    <span>max</span>
                   </div>
                 </div>
               </div>

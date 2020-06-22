@@ -1,13 +1,13 @@
 <template>
   <v-container id="filters">
-		<v-card max-width="100%">
-			<v-card-title class="justify-space-between align-start">
+		<v-card max-width="100%" class="pa-4">
+			<v-card-title class="justify-space-between align-start pa-0">
 				Filter Options
 				<v-icon v-if="isFilterOptionsActive" large @click="isFilterOptionsActive = false">minimize</v-icon>
 				<v-icon v-else large @click="isFilterOptionsActive = true">maximize</v-icon>
 			</v-card-title>
 
-			<v-card-text :class="{ 'd-none': !isFilterOptionsActive }" class="pb-0">
+			<v-card-text :class="{ 'd-none': !isFilterOptionsActive }" class="pa-0">
 				<v-row class="mx-0">
 					<v-col cols="6"	>
 						<v-row class="mx-0" no-gutters>
@@ -75,7 +75,7 @@
 				</v-row>
 			</v-card-text>
 
-			<v-card-actions class="px-4 py-4 justify-end" :class="{ 'd-none': !isFilterOptionsActive }">
+			<v-card-actions class="pl-0 pr-3 pb-0 justify-end" :class="{ 'd-none': !isFilterOptionsActive }">
 				<div class="mr-6">
 					<span v-if="!filteredData.length" class="mr-6 red--text">No data available with the given filters.</span>
 					<span v-if="!days.length" class="red--text">A day option should be selected.</span>
@@ -255,6 +255,14 @@ export default {
 
 <style lang="scss" scoped>
 @import "../scss/_colors";
+
+.v-card__title {
+	padding-bottom: 0;
+}
+
+.v-card__actions {
+	padding-top: 0!important;
+}
 
 .v-icon:focus:after {
 	opacity: 0!important;
