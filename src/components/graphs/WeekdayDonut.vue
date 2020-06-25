@@ -14,7 +14,7 @@ export default {
   data () {
     return {
 			svgWrapperSelector: 'weekday-donut',
-			title: 'Day average observations per weekday',
+			title: 'Day average observations per day of the week',
 			svgMargin: {
         top: 50,
         right: 10,
