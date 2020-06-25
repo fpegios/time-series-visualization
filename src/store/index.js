@@ -14,6 +14,7 @@ export default new Vuex.Store({
     filterDateFrom: undefined,
     filterDateTo: undefined,
     filteredData: [],
+    filterDate: undefined,
     filterMonth: undefined,
     filterWeek: undefined,
     filterWeekday: undefined,
@@ -45,6 +46,9 @@ export default new Vuex.Store({
     },
     spinnerStatus (state) {
       return state.spinnerStatus
+    },
+    filterDate (state) {
+      return state.filterDate
     },
     filterMonth (state) {
       return state.filterMonth
@@ -84,6 +88,9 @@ export default new Vuex.Store({
     },
     setSpinnerStatus (state, value) {
       state.spinnerStatus = value
+    },
+    setFilterDate (state, value) {
+      state.filterDate = value
     },
     setFilterMonth (state, value) {
       state.filterMonth = value

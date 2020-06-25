@@ -35,16 +35,25 @@ export default {
     },
     filteredData () {
       return this.data.filter(v => {
-				if (this.filter.month && this.filter.month !== v.date.getMonth()) return false
-				if (this.filter.week && this.filter.week !== v.week) return false
-				if (this.filter.weekday && this.filter.weekday !== v.date.getDay()) return false
-				if (this.filter.hour && this.filter.hour !== v.date.getHours()) return false
+				if (
+					this.filter.date !== undefined
+					&& (
+						this.filter.date.getMonth() !== v.date.getMonth()
+						|| this.filter.date.getDate() !== v.date.getDate()
+						|| this.filter.date.getFullYear() !== v.date.getFullYear()
+					)
+				) return false
+				if (this.filter.month !== undefined && this.filter.month !== v.date.getMonth()) return false
+				if (this.filter.week !== undefined && this.filter.week !== v.week) return false
+				if (this.filter.weekday !== undefined && this.filter.weekday !== v.date.getDay()) return false
+				if (this.filter.hour !== undefined && this.filter.hour !== v.date.getHours()) return false
 				
 				return true
 			})
 		},
     filter () {
       return {
+				date: this.$store.getters.filterDate,
 				month: this.$store.getters.filterMonth,
 				week: this.$store.getters.filterWeek,
 				weekday: this.$store.getters.filterWeekday,
@@ -66,6 +75,7 @@ export default {
 	},
 	watch: {
 		data () {
+			this.setFilter(false)
 			this.onDataSetHandler(this.filteredData)
 		},
 		filter (newValue, oldValue) {
@@ -73,6 +83,12 @@ export default {
 		}
 	},
   methods: {
+		formatDate (date) {
+			if (!date) return null
+
+			const [year, month, day] = date.split('-')
+			return `${day}/${month}/${year}`
+		},
     getWeek (d) {
       // Source: https://weeknumber.net/how-to/javascript
       const date = new Date(d)
@@ -142,6 +158,21 @@ export default {
 				.on('mouseout', function () {
 					that.d3.select(this).classed('hovered', false)
 					tooltip.classed('hidden', true)
+				})
+				.on('click', function (d) {
+					const isAlreadyClicked = that.d3.select(this).classed('active')
+
+					that.d3.select(`#${that.svgWrapperSelector} .bar.active`).classed('active', false)
+					
+					if (isAlreadyClicked) {
+						that.setFilter(false)
+						return
+					}
+					
+					that.d3.select(`#${that.svgWrapperSelector} .bar.active`).classed('active', false)
+					
+					that.d3.select(this).classed('active', true)
+					that.setFilter(true, d)
 				})
 
       svg.append('g')
@@ -248,6 +279,11 @@ export default {
 					`<span>${d.date.getDate()}-${d.date.getMonth() + 1}-${d.date.getFullYear()}</span>` +
 					`<span>${d.numOfObservations} observations</span>`
 				)
+		},
+		setFilter (status, data = undefined) {
+			this.isFiltered = status
+			this.svgWrapper.classed('filtered', status)
+			this.$store.commit('setFilterDate', data && new Date(data))
 		}
   },
   mounted () {
@@ -265,8 +301,12 @@ export default {
 	.bar {
 		fill: $cyan!important;
 		shape-rendering: crispEdges;
+		cursor: pointer;
 		&.hovered {
 			fill: darken($cyan, 10%)!important;
+		}
+		&.active {
+			stroke: black;
 		}
 	}
 
@@ -279,6 +319,14 @@ export default {
 
 	.axis-label {
 		font-size: 1.1em;
+	}
+	
+	.filtered {
+		.bar {
+			&:not(.active) {
+				opacity: .15;
+			}
+		}
 	}
 
 	.tooltip {
