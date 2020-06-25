@@ -4,69 +4,57 @@
       <v-card-text>
         <h2 class="text-center">{{ title }}</h2>
 
-        <v-row class="mx-0">
-          <v-col cols="12" class="d-flex flex-grow px-0">
-            <div v-if="leftIndex > 0" class="d-flex align-center mb-12">
-              <v-icon class="arrow" color="cyan lighten-1" @click="onArrowClickHandler(-1)">arrow_left</v-icon>
-            </div>
-            <div v-else class="d-flex align-center mb-12">
-              <v-icon class="arrow disabled" color="grey">arrow_left</v-icon>
-            </div>
-
-            <div class="flex-grow-1">
-              <div class="calendar-table">
-                <div class="calendar-table__column label mr-1" :style="getColumnWidth(1)">
-                  <div class="header"></div>
-                  <div class="hour" v-for="(hour, index) in hours" :key="index">
-                    <span>{{ getTwoDigitForm(index) }}:00</span>
-                  </div>
-                </div>
-                <div class="calendar-table__column" :style="getColumnWidth()" v-for="d in data" :key="d.id">
-                  <div class="header" :class="{ weekend: isWeekend(d.date) }">
-                    <span>{{ getWeekday(d.date) }}</span>
-                    <span>{{ getDateFormat(d.date) }}</span>
-                  </div>
-                  <div class="hour" :class="getHourClass(d.date, hour.numOfObservations)" v-for="hour in d.hourGroupData" :key="hour.id">
-                    <span>{{ hour.numOfObservations || '-'}}</span>
-                  </div>
+        <v-row class="calendar-table-wrapper mx-0 position-relative">
+          <v-col cols="12" class="d-flex flex-column flex-grow px-0 overflow-x-auto">
+            <div class="calendar-table">
+              <div class="calendar-table__column label position-absolute">
+                <div class="header"></div>
+                <div class="hour" v-for="(hour, index) in hours" :key="index">
+                  <span>{{ getTwoDigitForm(index) }}:00</span>
                 </div>
               </div>
-
-              <div class="calendar-table">
-                <div class="calendar-table__column label mr-1" :style="getColumnWidth(1)">
-                  <span class="hour">Total</span>
+              <div class="calendar-table__column" v-for="d in data" :key="d.id" :style="columnWidth">
+                <div class="header" :class="{ weekend: isWeekend(d.date) }">
+                  <span>{{ getWeekday(d.date) }}</span>
+                  <span>{{ getDateFormat(d.date) }}</span>
                 </div>
-                <div class="calendar-table__column" :style="getColumnWidth()" v-for="d in data" :key="d.id">
-                  <div class="hour total" :class="getDayClass(d.date, d.totalNumOfObservations)">
-                    <span>{{ d.totalNumOfObservations || '-'}}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex justify-end my-5">
-                <div class="legend">
-                  <div class="legend-parts d-flex">
-                    <div class="gradient-0"></div>
-                    <div class="gradient-1"></div>
-                    <div class="gradient-2"></div>
-                    <div class="gradient-3"></div>
-                    <div class="gradient-4"></div>
-                    <div class="gradient-5"></div>
-                    <div class="gradient-6"></div>
-                  </div>
-                  <div class="d-flex justify-space-between">
-                    <span>min</span>
-                    <span>max</span>
-                  </div>
+                <div class="hour" :class="getHourClass(d.date, hour.numOfObservations)" v-for="hour in d.hourGroupData" :key="hour.id">
+                  <span>{{ hour.numOfObservations || '-'}}</span>
                 </div>
               </div>
             </div>
-            
-            <div v-if="rightIndex < dayGroupData.length" class="d-flex align-center mb-12">
-              <v-icon class="arrow" color="cyan lighten-1" @click="onArrowClickHandler(1)">arrow_right</v-icon>
+
+            <div class="calendar-table">
+              <div class="calendar-table__column label position-absolute">
+                <span class="hour"><b>Total</b></span>
+              </div>
+              <div class="calendar-table__column" v-for="d in data" :key="d.id" :style="columnWidth">
+                <div class="hour total" :class="getDayClass(d.date, d.totalNumOfObservations)">
+                  <span>{{ d.totalNumOfObservations || '-'}}</span>
+                </div>
+              </div>
             </div>
-            <div v-else class="d-flex align-center mb-12">
-              <v-icon class="arrow disabled" color="grey">arrow_right</v-icon>
+          </v-col>
+        </v-row>
+        
+        <v-row>
+          <v-col cols="12" class="py-0">
+            <div class="d-flex justify-end my-5">
+              <div class="legend">
+                <div class="legend-parts d-flex">
+                  <div class="gradient-0"></div>
+                  <div class="gradient-1"></div>
+                  <div class="gradient-2"></div>
+                  <div class="gradient-3"></div>
+                  <div class="gradient-4"></div>
+                  <div class="gradient-5"></div>
+                  <div class="gradient-6"></div>
+                </div>
+                <div class="d-flex justify-space-between">
+                  <span>min</span>
+                  <span>max</span>
+                </div>
+              </div>
             </div>
           </v-col>
         </v-row>
@@ -99,8 +87,11 @@ export default {
     }
   },
   computed: {
+    d3 () {
+      return this.$store.getters.d3
+    },
     data () {
-      return this.dayGroupData.slice(this.leftIndex, this.rightIndex + 1)
+      return this.dayGroupData  
     },
     filteredData () {
       return this.$store.getters.filteredData
@@ -120,6 +111,19 @@ export default {
     filterDays() {
       return this.$store.getters.filterDays
     },
+    calendarTableWrapper () {
+      return this.d3.select(`.calendar-table-wrapper`)
+    },
+    calendarTableWrapperWidth () {
+      return this.calendarTableWrapper && this.calendarTableWrapper.node() && this.calendarTableWrapper.node().getBoundingClientRect().width
+    },
+    columnWidth () {
+      const numOfVisibleColumns = this.data.length > this.maxCells
+        ? this.maxCells
+        : this.data.length
+
+      return `min-width: ${(this.calendarTableWrapperWidth - 35) / numOfVisibleColumns}px`
+    }
   },
   watch: {
     filteredData () {
@@ -130,9 +134,6 @@ export default {
 		}
   },
   methods: {
-    getColumnWidth (label = undefined) {
-      return `width: 100%; ${label ? 'max-width' : 'min-width'}: ${(100 / (this.maxCells + 1))}%`
-    },
 		getTwoDigitForm (number) {
 			return ('0' + number).slice(-2)
 		},
@@ -272,8 +273,11 @@ export default {
 .calendar-table {
   display: flex;
   flex: 1;
+  padding-left: 35px;
 
   &__column {
+    pointer-events: none;
+
     .header {
       background-color: $cyan;
       color: white;
@@ -319,7 +323,9 @@ export default {
     }
 
     &.label {
-      width: auto;
+      left: 0;
+      min-width: 35px;
+      width: 35px;
       .header,
       .hour {
         font-size: .75em;
