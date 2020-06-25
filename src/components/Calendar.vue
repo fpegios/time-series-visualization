@@ -70,7 +70,6 @@ export default {
     return {
       title: 'Calendar',
       maxCells: 30,
-      shift: 0,
       dayGroupData: [],
 			weekdayNames: [
 				'Sunday',
@@ -95,12 +94,6 @@ export default {
     },
     filteredData () {
       return this.$store.getters.filteredData
-    },
-    leftIndex () {
-      return 0 + this.shift
-    },
-    rightIndex () {
-      return this.maxCells - 1 + this.shift
     },
     filterDateFrom () {
       return this.$store.getters.filterDateFrom
@@ -127,7 +120,6 @@ export default {
   },
   watch: {
     filteredData () {
-      this.shift = 0
       this.maxNumOfObservations_hour = 0
       this.maxNumOfObservations_day = 0
 			this.onDataSetHandler(this.filteredData)
@@ -256,9 +248,6 @@ export default {
 		},
 		onDataSetHandler (data) {
       this.dayGroupData = this.getDayGroupData(data)
-    },
-    onArrowClickHandler (shift) {
-      this.shift = this.shift + shift
     }
   },
   mounted () {
@@ -341,25 +330,6 @@ export default {
         border-right: 1px solid $grey;
       }
     }
-  }
-}
-
-.arrow {
-  cursor: pointer;
-  font-size: 100px!important;
-  max-width: 30px;
-
-  &:not(.disabled) {
-    &:hover {
-      transform: scale(1.2);
-    }
-    &:active {
-      transform: scale(1);
-    }
-  }
-
-  &:focus::after {
-    display: none
   }
 }
 
