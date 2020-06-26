@@ -81,7 +81,7 @@
 					<span v-if="!days.length" class="red--text">A day option should be selected.</span>
 				</div>
 				<v-btn color="red" small outlined @click="onResetFiltersHandler">Reset Filters</v-btn>
-				<v-btn color="red" small dark @click="filterData">Find Data</v-btn>
+				<v-btn color="red" small dark @click="filterData">Search</v-btn>
 			</v-card-actions>
     </v-card>
   </v-container>
